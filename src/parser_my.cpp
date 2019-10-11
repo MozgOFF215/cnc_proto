@@ -1,8 +1,8 @@
 #include "header.h"
 #include "main.h"
-#include "parser.h"
+#include "parser_my.h"
 
-void parse(const char *p)
+void parse_my(const char *p)
 {
   // Skip spaces
   while (*p == ' ')

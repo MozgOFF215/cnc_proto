@@ -41,7 +41,7 @@ void loop()
     Serial.println("command: " + inputString);
     inputString = "";
     stringComplete = false;
-    parse(inputString.c_str());
+    parse_my(inputString.c_str());
   }
 
   // moveTo(0);
