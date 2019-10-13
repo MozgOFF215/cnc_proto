@@ -7,7 +7,8 @@ struct Config
   const int timeDrive = 5000;
   const int minSpeed = 200;
   const int maxSpeed = 255;
-  const long slowDistance = 50;
+  const long slowDistance = 200;
+  const int stopendProtectDistance = 50;
 };
 
 extern Config config;

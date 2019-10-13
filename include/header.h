@@ -1,5 +1,10 @@
 #include <Arduino.h>
+#include "macros.h"
 #include "pins.h"
 #include "config.h"
 #include "state.h"
+#include "main.h"
+#include "interrupts.h"
+#include "moving.h"
 #include "parser_my.h"
+#include "workspace_research.h"

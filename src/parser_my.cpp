@@ -1,6 +1,5 @@
 #include "header.h"
 #include "main.h"
-#include "parser_my.h"
 
 void parse_my(const char *p)
 {
@@ -13,15 +12,21 @@ void parse_my(const char *p)
   int codenum = 0;
   do
   {
-    codenum *= 10, codenum += *p++ - '0';
+    codenum *= 10;
+    codenum += *p++ - '0';
   } while (NUMERIC(*p));
 
   Serial.println(codenum, DEC);
   Serial.println(letter);
 
-  //if (letter == 'P')
+  if (letter == 'P')
   {
-    Serial.println("moveTo...");
+    SHOW_MESSAGE("moveTo...");
     moveTo(codenum);
+  }
+
+  if (letter == 'G')
+  {
+    if (codenum == 28) startResearch();
   }
 }
