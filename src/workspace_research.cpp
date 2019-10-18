@@ -50,7 +50,8 @@ void leaveEndStop()
     SHOW_MESSAGE((String) "5. Max found: " + state.maxPos);
 
     SHOW_MESSAGE("5. end workspace research");
-    state.workspaceResearchMode = NO_RESEARCH;
+    state.workspaceResearchMode = NO_PROCESS;
+    state.isWorkspaceKnown = true;
 
     SHOW_MESSAGE("5. go to 0");
     goBack(0, config.maxSpeed);

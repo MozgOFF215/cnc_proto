@@ -3,6 +3,11 @@
 
 #include "header.h"
 
+enum moveDirection{
+  FORWARD,
+  BACKWARD
+};
+
 struct State
 {
   long currentPos = 0;
@@ -12,11 +17,13 @@ struct State
   long minPos = -9999;
   long maxPos = 9999;
 
+  bool isWorkspaceKnown = false;
   bool isZeroFound = false;
 
   moveDirection currentDirect = FORWARD;
 
-  wsr_step workspaceResearchMode = NO_RESEARCH;
+  search_steps workspaceResearchMode = NO_PROCESS;
+  search_steps zeroSearchMode = NO_PROCESS;
 
   void (*endMovingFunction)();
 };

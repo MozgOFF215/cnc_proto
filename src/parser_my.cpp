@@ -26,7 +26,18 @@ void parse_my(const char *p)
       if (state.isZeroFound)
         moveTo(0);
       else
-        startResearch();
+        startZeroSeek();
     }
+
+    if (codenum == 280)
+    {
+      if (!state.isWorkspaceKnown)
+        startResearch();
+      else
+        SHOW_MESSAGE("Workspace alredy known. max=" + state.maxPos);
+    }
+
+    if (codenum == 281)
+      startResearch();
   }
 }

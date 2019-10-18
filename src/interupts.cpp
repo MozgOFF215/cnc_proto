@@ -64,8 +64,10 @@ void endStopInterrupt()
   {
     stop((String) "endstop" + (END1 ? "1" : "2"));
 
-    if (state.workspaceResearchMode != NO_RESEARCH)
+    if (state.workspaceResearchMode != NO_PROCESS)
       foundEndStop();
+    if (state.zeroSearchMode != NO_PROCESS)
+      foundEndStop_0();
   }
   else
   {
@@ -74,6 +76,12 @@ void endStopInterrupt()
       stop("leave endstop");
       SHOW_MESSAGE("leave endstop");
       leaveEndStop();
+    }
+    if (state.zeroSearchMode == SEEK_0)
+    {
+      stop("leave endstop");
+      SHOW_MESSAGE("leave endstop");
+      leaveEndStop_0();
     }
   }
 }

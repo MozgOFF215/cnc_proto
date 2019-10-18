@@ -8,3 +8,4 @@
 #include "moving.h"
 #include "parser_my.h"
 #include "workspace_research.h"
+#include "seek_0.h"
