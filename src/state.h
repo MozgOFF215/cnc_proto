@@ -7,13 +7,14 @@ struct State
 {
   long currentPos = 0;
   long requiredPos = 0;
+  bool isStoped = true;
 
   long minPos = -9999;
   long maxPos = 9999;
 
-  moveDirection currentDirect = FORWARD;
+  bool isZeroFound = false;
 
-  bool isStoped = true;
+  moveDirection currentDirect = FORWARD;
 
   wsr_step workspaceResearchMode = NO_RESEARCH;
 

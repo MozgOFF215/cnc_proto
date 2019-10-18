@@ -37,6 +37,7 @@ void leaveEndStop()
     SHOW_MESSAGE("3. 0 found");
     state.currentPos = -config.stopendProtectDistance;
     state.minPos = 0;
+    state.isZeroFound = true;
 
     SHOW_MESSAGE("3. Search right endstop.");
     state.workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;

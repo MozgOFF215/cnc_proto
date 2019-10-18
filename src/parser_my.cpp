@@ -16,17 +16,17 @@ void parse_my(const char *p)
     codenum += *p++ - '0';
   } while (NUMERIC(*p));
 
-  Serial.println(codenum, DEC);
-  Serial.println(letter);
-
-  if (letter == 'P')
-  {
-    SHOW_MESSAGE("moveTo...");
+  if (letter == 'X')
     moveTo(codenum);
-  }
 
   if (letter == 'G')
   {
-    if (codenum == 28) startResearch();
+    if (codenum == 28)
+    {
+      if (state.isZeroFound)
+        moveTo(0);
+      else
+        startResearch();
+    }
   }
 }
