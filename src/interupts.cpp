@@ -3,18 +3,18 @@
 
 void initInterrupts()
 {
-  attachInterrupt(p_enc1, encoderInterrupt, CHANGE);
-  attachInterrupt(p_end1, endStopInterrupt, CHANGE);
-  attachInterrupt(p_end2, endStopInterrupt, CHANGE);
+  attachInterrupt(X_enc1, encoderInterrupt, CHANGE);
+  attachInterrupt(X_end1, endStopInterrupt, CHANGE);
+  attachInterrupt(X_end2, endStopInterrupt, CHANGE);
 }
 
 void encoderInterrupt()
 {
-  if (digitalRead(p_enc1) && digitalRead(p_enc2))
+  if (digitalRead(X_enc1) && digitalRead(X_enc2))
     state.currentPos++;
   else
     state.currentPos--;
-  if (!digitalRead(p_enc1) && digitalRead(p_enc2))
+  if (!digitalRead(X_enc1) && digitalRead(X_enc2))
     state.currentPos--;
   else
     state.currentPos++;
@@ -36,8 +36,8 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.currentPos - state.requiredPos) < config.slowDistance)
-        setSpeed(config.minSpeed);
+      if ((state.currentPos - state.requiredPos) < config.X_slowDistance)
+        setSpeed(config.X_minSpeed);
     }
 
     if (state.currentDirect == FORWARD)
@@ -52,8 +52,8 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.requiredPos - state.currentPos) < config.slowDistance)
-        setSpeed(config.minSpeed);
+      if ((state.requiredPos - state.currentPos) < config.X_slowDistance)
+        setSpeed(config.X_minSpeed);
     }
   }
 }

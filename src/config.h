@@ -3,12 +3,12 @@
 
 struct Config
 {
-  const int timeWait = 200;
-  const int timeDrive = 5000;
-  const int minSpeed = 200;
-  const int maxSpeed = 255;
-  const long slowDistance = 200;
-  const int stopendProtectDistance = 50;
+  const int X_timeWait = 200;
+  const int X_timeDrive = 5000;
+  const int X_minSpeed = 200;
+  const int X_maxSpeed = 255;
+  const long X_slowDistance = 200;
+  const int X_stopendProtectDistance = 50;
 };
 
 extern Config config;

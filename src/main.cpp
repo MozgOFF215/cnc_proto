@@ -7,11 +7,11 @@ bool stringComplete = false; // whether the string is complete
 void setup()
 {
   pinMode(p_led, OUTPUT);
-  pinMode(p_turnFwd, OUTPUT);
-  pinMode(p_turnBwd, OUTPUT);
-  pinMode(p_enA, OUTPUT);
-  pinMode(p_end1, INPUT_PULLUP);
-  pinMode(p_end2, INPUT_PULLUP);
+  pinMode(X_turnFwd, OUTPUT);
+  pinMode(X_turnBwd, OUTPUT);
+  pinMode(X_enA, OUTPUT);
+  pinMode(X_end1, INPUT_PULLUP);
+  pinMode(X_end2, INPUT_PULLUP);
 
   initInterrupts();
 

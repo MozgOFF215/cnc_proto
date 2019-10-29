@@ -9,7 +9,7 @@ void startZeroSeek()
   }
   SHOW_MESSAGE("1. Start zero seek. Search left endstop.");
   state.zeroSearchMode = LEFT_ENDSTOP_SEARCH;
-  goBack(-9999, config.maxSpeed);
+  goBack(-9999, config.X_maxSpeed);
 }
 
 void foundEndStop_0()
@@ -18,7 +18,7 @@ void foundEndStop_0()
   {
     SHOW_MESSAGE("2. Seek 0");
     state.zeroSearchMode = SEEK_0;
-    goForward(100, config.minSpeed);
+    goForward(100, config.X_minSpeed);
   }
 }
 
@@ -27,7 +27,7 @@ void leaveEndStop_0()
   if (state.workspaceResearchMode == SEEK_0)
   {
     SHOW_MESSAGE("3. 0 found");
-    state.currentPos = -config.stopendProtectDistance;
+    state.currentPos = -config.X_stopendProtectDistance;
     state.minPos = 0;
     state.isZeroFound = true;
 
