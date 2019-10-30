@@ -3,10 +3,10 @@
 
 void moveTo(long pos)
 {
-  if (state.currentPos == pos)
+  if (state.X_currentPos == pos)
     return;
 
-  if (state.currentPos < pos)
+  if (state.X_currentPos < pos)
   {
     if (END2)
     {
@@ -14,7 +14,7 @@ void moveTo(long pos)
       return;
     }
 
-    if ((pos - state.currentPos) < config.X_slowDistance)
+    if ((pos - state.X_currentPos) < config.X_slowDistance)
       goForward(pos, config.X_minSpeed);
     else
       goForward(pos, config.X_maxSpeed);
@@ -27,7 +27,7 @@ void moveTo(long pos)
     return;
   }
 
-  if ((state.currentPos - pos) < config.X_slowDistance)
+  if ((state.X_currentPos - pos) < config.X_slowDistance)
     goBack(pos, config.X_minSpeed);
   else
     goBack(pos, config.X_maxSpeed);
@@ -35,28 +35,28 @@ void moveTo(long pos)
 
 void goForward(long pos, int speed)
 {
-  SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + state.currentPos + " speed: " + speed);
+  SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + state.X_currentPos + " speed: " + speed);
 
   digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, HIGH);
   digitalWrite(X_turnBwd, LOW);
   setSpeed(speed);
-  state.requiredPos = pos;
-  state.currentDirect = FORWARD;
-  state.isStoped = false;
+  state.X_requiredPos = pos;
+  state.X_currentDirect = FORWARD;
+  state.X_isStoped = false;
 }
 
 void goBack(long pos, int speed)
 {
-  SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + state.currentPos + " speed: " + speed);
+  SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + state.X_currentPos + " speed: " + speed);
 
   digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, HIGH);
   setSpeed(speed);
-  state.requiredPos = pos;
-  state.currentDirect = BACKWARD;
-  state.isStoped = false;
+  state.X_requiredPos = pos;
+  state.X_currentDirect = BACKWARD;
+  state.X_isStoped = false;
 }
 
 void stop(String reason)
@@ -65,9 +65,9 @@ void stop(String reason)
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, LOW);
   setSpeed(config.X_maxSpeed);
-  state.isStoped = true;
+  state.X_isStoped = true;
 
-  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + state.requiredPos + " current:" + state.currentPos);
+  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + state.X_requiredPos + " current:" + state.X_currentPos);
 }
 
 int g_lastSpeed = 0;
@@ -76,7 +76,7 @@ void setSpeed(int speed)
 {
   if (speed != g_lastSpeed)
   {
-    SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + state.currentPos);
+    SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + state.X_currentPos);
     analogWrite(X_enA, speed);
     g_lastSpeed = speed;
   }

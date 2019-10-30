@@ -17,7 +17,7 @@ void setup()
 
   Serial.begin(38400);
 
-  state.endMovingFunction = nullptr;
+  state.X_endMovingFunction = nullptr;
 
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);

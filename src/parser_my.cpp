@@ -23,7 +23,7 @@ void parse_my(const char *p)
   {
     if (codenum == 28)
     {
-      if (state.isZeroFound)
+      if (state.X_isZeroFound)
         moveTo(0);
       else
         startZeroSeek();
@@ -31,13 +31,23 @@ void parse_my(const char *p)
 
     if (codenum == 280)
     {
-      if (!state.isWorkspaceKnown)
+      if (!state.X_isWorkspaceKnown)
         startResearch();
       else
-        SHOW_MESSAGE("Workspace alredy known. max=" + state.maxPos);
+        SHOW_MESSAGE((String) "Workspace alredy known. max=" + state.X_maxPos);
     }
 
     if (codenum == 281)
       startResearch();
+
+    if (codenum == 555)
+    {
+      String mon = "endstops: X-=";
+      mon += (END1 ? "1" : "0");
+      mon += " X+=";
+      mon += (END2 ? "1" : "0");
+      SHOW_MESSAGE(mon);
+      SHOW_MESSAGE((String) "position" + state.X_currentPos);
+    }
   }
 }

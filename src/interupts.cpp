@@ -11,48 +11,48 @@ void initInterrupts()
 void encoderInterrupt()
 {
   if (digitalRead(X_enc1) && digitalRead(X_enc2))
-    state.currentPos++;
+    state.X_currentPos++;
   else
-    state.currentPos--;
+    state.X_currentPos--;
   if (!digitalRead(X_enc1) && digitalRead(X_enc2))
-    state.currentPos--;
+    state.X_currentPos--;
   else
-    state.currentPos++;
+    state.X_currentPos++;
 
-  if (state.isStoped)
+  if (state.X_isStoped)
     return;
 
-  if (!state.isStoped)
+  if (!state.X_isStoped)
   {
-    if (state.currentDirect == BACKWARD)
+    if (state.X_currentDirect == BACKWARD)
     {
-      if (state.currentPos <= state.requiredPos)
+      if (state.X_currentPos <= state.X_requiredPos)
       {
         stop("c<=r");
 
-        // if (state.endMovingFunction != nullptr)
-        //   state.endMovingFunction();
+        // if (state.X_endMovingFunction != nullptr)
+        //   state.X_endMovingFunction();
 
         return;
       }
 
-      if ((state.currentPos - state.requiredPos) < config.X_slowDistance)
+      if ((state.X_currentPos - state.X_requiredPos) < config.X_slowDistance)
         setSpeed(config.X_minSpeed);
     }
 
-    if (state.currentDirect == FORWARD)
+    if (state.X_currentDirect == FORWARD)
     {
-      if (state.currentPos >= state.requiredPos)
+      if (state.X_currentPos >= state.X_requiredPos)
       {
         stop("c>=r");
 
-        // if (state.endMovingFunction != nullptr)
-        //   state.endMovingFunction();
+        // if (state.X_endMovingFunction != nullptr)
+        //   state.X_endMovingFunction();
 
         return;
       }
 
-      if ((state.requiredPos - state.currentPos) < config.X_slowDistance)
+      if ((state.X_requiredPos - state.X_currentPos) < config.X_slowDistance)
         setSpeed(config.X_minSpeed);
     }
   }
@@ -64,20 +64,20 @@ void endStopInterrupt()
   {
     stop((String) "endstop" + (END1 ? "1" : "2"));
 
-    if (state.workspaceResearchMode != NO_PROCESS)
+    if (state.X_workspaceResearchMode != NO_PROCESS)
       foundEndStop();
-    if (state.zeroSearchMode != NO_PROCESS)
+    if (state.X_zeroSearchMode != NO_PROCESS)
       foundEndStop_0();
   }
   else
   {
-    if (state.workspaceResearchMode == SEEK_0 || state.workspaceResearchMode == SEEK_MAX)
+    if (state.X_workspaceResearchMode == SEEK_0 || state.X_workspaceResearchMode == SEEK_MAX)
     {
       stop("leave endstop");
       SHOW_MESSAGE("leave endstop");
       leaveEndStop();
     }
-    if (state.zeroSearchMode == SEEK_0)
+    if (state.X_zeroSearchMode == SEEK_0)
     {
       stop("leave endstop");
       SHOW_MESSAGE("leave endstop");
