@@ -1,8 +1,6 @@
 #ifndef _PINS_H_
 #define _PINS_H_
 
-#include <Arduino.h>
-
 #define p_led LED_BUILTIN // PIN_D6 led
 #define p_set0 PIN_F7     // research work area
 

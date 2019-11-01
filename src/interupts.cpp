@@ -26,7 +26,7 @@ void encoderInterrupt()
   {
     if (state.X_currentDirect == BACKWARD)
     {
-      if (state.X_currentPos <= state.X_requiredPos)
+      if (state.X_currentPos <= state.X_destinationPos)
       {
         stop("c<=r");
 
@@ -36,13 +36,13 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.X_currentPos - state.X_requiredPos) < config.X_slowDistance)
+      if ((state.X_currentPos - state.X_destinationPos) < config.X_slowDistance)
         setSpeed(config.X_minSpeed);
     }
 
     if (state.X_currentDirect == FORWARD)
     {
-      if (state.X_currentPos >= state.X_requiredPos)
+      if (state.X_currentPos >= state.X_destinationPos)
       {
         stop("c>=r");
 
@@ -52,7 +52,7 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.X_requiredPos - state.X_currentPos) < config.X_slowDistance)
+      if ((state.X_destinationPos - state.X_currentPos) < config.X_slowDistance)
         setSpeed(config.X_minSpeed);
     }
   }

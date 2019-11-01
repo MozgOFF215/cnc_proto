@@ -23,5 +23,4 @@ struct Config
 };
 
 extern Config config;
-
 #endif // _CONFIG_H_

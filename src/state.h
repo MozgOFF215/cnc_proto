@@ -1,19 +1,12 @@
-#ifndef _STATE_H_
-#define _STATE_H_
-
-#include "header.h"
-
-enum moveDirection{
-  FORWARD,
-  BACKWARD
-};
+#ifndef _STATE_H_1
+#define _STATE_H_1
 
 struct State
 {
   // X axis
-  
+
   long X_currentPos = 0;
-  long X_requiredPos = 0;
+  long X_destinationPos = 0;
   bool X_isStoped = true;
 
   long X_minPos = -9999;
@@ -32,7 +25,7 @@ struct State
   // Y axis
 
   long Y_currentPos = 0;
-  long Y_requiredPos = 0;
+  long Y_destinationPos = 0;
   bool Y_isStoped = true;
 
   long Y_minPos = -9999;
@@ -47,9 +40,8 @@ struct State
   search_steps Y_zeroSearchMode = NO_PROCESS;
 
   void (*Y_endMovingFunction)();
-
 };
 
 extern State state;
 
-#endif // _STATE_H_
+#endif // _STATE_H_1

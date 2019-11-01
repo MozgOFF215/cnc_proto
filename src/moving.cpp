@@ -41,7 +41,7 @@ void goForward(long pos, int speed)
   digitalWrite(X_turnFwd, HIGH);
   digitalWrite(X_turnBwd, LOW);
   setSpeed(speed);
-  state.X_requiredPos = pos;
+  state.X_destinationPos = pos;
   state.X_currentDirect = FORWARD;
   state.X_isStoped = false;
 }
@@ -54,7 +54,7 @@ void goBack(long pos, int speed)
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, HIGH);
   setSpeed(speed);
-  state.X_requiredPos = pos;
+  state.X_destinationPos = pos;
   state.X_currentDirect = BACKWARD;
   state.X_isStoped = false;
 }
@@ -67,7 +67,7 @@ void stop(String reason)
   setSpeed(config.X_maxSpeed);
   state.X_isStoped = true;
 
-  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + state.X_requiredPos + " current:" + state.X_currentPos);
+  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + state.X_destinationPos + " current:" + state.X_currentPos);
 }
 
 int g_lastSpeed = 0;

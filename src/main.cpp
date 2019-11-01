@@ -1,5 +1,4 @@
 #include "header.h"
-#include "main.h"
 
 String inputString = "";     // a String to hold incoming data
 bool stringComplete = false; // whether the string is complete
@@ -12,6 +11,8 @@ void setup()
   pinMode(X_enA, OUTPUT);
   pinMode(X_end1, INPUT_PULLUP);
   pinMode(X_end2, INPUT_PULLUP);
+
+  //initController();
 
   initInterrupts();
 
@@ -42,4 +43,6 @@ void loop()
     parse_my(inputString.toUpperCase().c_str());
     inputString = "";
   }
+
+  //controller();
 }
