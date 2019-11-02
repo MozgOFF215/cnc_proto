@@ -2,4 +2,4 @@
 #include "state.h"
 
 // Create a global instance of the State singleton
-State X_state; // Axis X
+State X_state("Axis X"); // Axis X

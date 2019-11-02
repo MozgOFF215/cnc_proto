@@ -1,9 +1,13 @@
 #ifndef _STATE_H_1
 #define _STATE_H_1
 
-struct State
+class State
 {
-   long currentPos = 0;
+public:
+  State(char name[8]) { strcpy(axis_name, name); }
+
+  char axis_name[8];
+  long currentPos = 0;
   long destinationPos = 0;
   bool isStoped = true;
 
@@ -21,6 +25,6 @@ struct State
   void (*endMovingFunction)();
 };
 
-extern State X_state; // Axis X
+extern State X_state;
 
 #endif // _STATE_H_1
