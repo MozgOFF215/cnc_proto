@@ -36,8 +36,8 @@ void X_encoderInterrupt()
         return;
       }
 
-      if ((X_state.currentPos - X_state.destinationPos) < X_config.X_slowDistance)
-        setSpeed(&X_state, X_config.X_minSpeed);
+      if ((X_state.currentPos - X_state.destinationPos) < X_config.slowDistance)
+        setSpeed(&X_state, X_config.minSpeed);
     }
 
     if (X_state.currentDirect == FORWARD)
@@ -52,8 +52,8 @@ void X_encoderInterrupt()
         return;
       }
 
-      if ((X_state.destinationPos - X_state.currentPos) < X_config.X_slowDistance)
-        setSpeed(&X_state, X_config.X_minSpeed);
+      if ((X_state.destinationPos - X_state.currentPos) < X_config.slowDistance)
+        setSpeed(&X_state, X_config.minSpeed);
     }
   }
 }

@@ -7,8 +7,13 @@ struct pidMV
   moveDirection direction;
 };
 
-struct pidState
+class pidState
 {
+public:
+  pidState(const char name[8]);
+
+  char axis_name[8];
+
   long prevPos;
   long prevIntg;
   long prevE;

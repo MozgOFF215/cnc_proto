@@ -4,7 +4,7 @@
 class State
 {
 public:
-  State(char name[8]) { strcpy(axis_name, name); }
+  State(const char name[8]);
 
   char axis_name[8];
   long currentPos = 0;

@@ -1,7 +1,18 @@
 #include "header.h"
 #include "controller.h"
 
-pidState X_pidState;
+pidState::pidState(const char name[8])
+{
+  axis_name[0] = name[0];
+  axis_name[1] = name[1];
+  axis_name[2] = name[2];
+  axis_name[3] = name[3];
+  axis_name[4] = name[4];
+  axis_name[5] = name[5];
+  axis_name[6] = name[6];
+  axis_name[7] = name[7];
+}
+pidState X_pidState("Axis X");
 
 void initController(pidState *ps)
 {
@@ -70,8 +81,8 @@ pidMV getX_MV(Config *cfg, State *st, pidState *ps)
   else
     MV = -MV;
 
-  if (MV > cfg->X_maxSpeed)
-    newMV.pwm = cfg->X_maxSpeed;
+  if (MV > cfg->maxSpeed)
+    newMV.pwm = cfg->maxSpeed;
   else
     newMV.pwm = MV;
 

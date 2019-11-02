@@ -14,10 +14,10 @@ void moveTo(Config *cfg, State *st, long pos)
       return;
     }
 
-    if ((pos - st->currentPos) < cfg->X_slowDistance)
-      goForward(st, pos, cfg->X_minSpeed);
+    if ((pos - st->currentPos) < cfg->slowDistance)
+      goForward(st, pos, cfg->minSpeed);
     else
-      goForward(st, pos, cfg->X_maxSpeed);
+      goForward(st, pos, cfg->maxSpeed);
     return;
   }
 
@@ -27,17 +27,16 @@ void moveTo(Config *cfg, State *st, long pos)
     return;
   }
 
-  if ((st->currentPos - pos) < cfg->X_slowDistance)
-    goBack(st, pos, cfg->X_minSpeed);
+  if ((st->currentPos - pos) < cfg->slowDistance)
+    goBack(st, pos, cfg->minSpeed);
   else
-    goBack(st, pos, cfg->X_maxSpeed);
+    goBack(st, pos, cfg->maxSpeed);
 }
 
 void goForward(State *st, long pos, int speed)
 {
   SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 
-  digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, HIGH);
   digitalWrite(X_turnBwd, LOW);
   setSpeed(st, speed);
@@ -50,7 +49,6 @@ void goBack(State *st, long pos, int speed)
 {
   SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 
-  digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, HIGH);
   setSpeed(st, speed);
@@ -61,10 +59,9 @@ void goBack(State *st, long pos, int speed)
 
 void stop(Config *cfg, State *st, String reason)
 {
-  digitalWrite(p_led, LOW);
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, LOW);
-  setSpeed(st, cfg->X_maxSpeed);
+  setSpeed(st, cfg->maxSpeed);
   st->isStoped = true;
 
   SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + st->destinationPos + " current:" + st->currentPos);
