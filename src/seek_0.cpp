@@ -1,6 +1,6 @@
 #include "header.h"
 
-void startZeroSeek()
+void startZeroSeek(Config *cfg, State *st)
 {
   if (END1 /*|| END2 */)
   {
@@ -8,32 +8,32 @@ void startZeroSeek()
     return;
   }
   SHOW_MESSAGE("1. Start zero seek. Search left endstop.");
-  state.X_zeroSearchMode = LEFT_ENDSTOP_SEARCH;
-  goBack(-9999, config.X_maxSpeed);
+  st->zeroSearchMode = LEFT_ENDSTOP_SEARCH;
+  goBack(st, -9999, cfg->X_maxSpeed);
 }
 
-void foundEndStop_0()
+void foundEndStop_0(Config *cfg, State *st)
 {
-  if (state.X_zeroSearchMode == LEFT_ENDSTOP_SEARCH)
+  if (st->zeroSearchMode == LEFT_ENDSTOP_SEARCH)
   {
     SHOW_MESSAGE("2. Seek 0");
-    state.X_zeroSearchMode = SEEK_0;
-    goForward(100, config.X_minSpeed);
+    st->zeroSearchMode = SEEK_0;
+    goForward(st, 100, cfg->X_minSpeed);
   }
 }
 
-void leaveEndStop_0()
+void leaveEndStop_0(Config *cfg, State *st)
 {
-  if (state.X_zeroSearchMode == SEEK_0)
+  if (st->zeroSearchMode == SEEK_0)
   {
     SHOW_MESSAGE("3. 0 found");
-    state.X_currentPos = -config.X_stopendProtectDistance;
-    state.X_minPos = 0;
-    state.X_isZeroFound = true;
+    st->currentPos = -cfg->X_stopendProtectDistance;
+    st->minPos = 0;
+    st->isZeroFound = true;
 
-    state.X_zeroSearchMode = NO_PROCESS;
+    st->zeroSearchMode = NO_PROCESS;
 
     SHOW_MESSAGE("4. go to 0");
-    moveTo(0);
+    moveTo(cfg, st, 0);
   }
 }

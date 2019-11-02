@@ -1,12 +1,12 @@
 #include "header.h"
 #include "moving.h"
 
-void moveTo(long pos)
+void moveTo(Config *cfg, State *st, long pos)
 {
-  if (state.X_currentPos == pos)
+  if (st->currentPos == pos)
     return;
 
-  if (state.X_currentPos < pos)
+  if (st->currentPos < pos)
   {
     if (END2)
     {
@@ -14,10 +14,10 @@ void moveTo(long pos)
       return;
     }
 
-    if ((pos - state.X_currentPos) < config.X_slowDistance)
-      goForward(pos, config.X_minSpeed);
+    if ((pos - st->currentPos) < cfg->X_slowDistance)
+      goForward(st, pos, cfg->X_minSpeed);
     else
-      goForward(pos, config.X_maxSpeed);
+      goForward(st, pos, cfg->X_maxSpeed);
     return;
   }
 
@@ -27,56 +27,56 @@ void moveTo(long pos)
     return;
   }
 
-  if ((state.X_currentPos - pos) < config.X_slowDistance)
-    goBack(pos, config.X_minSpeed);
+  if ((st->currentPos - pos) < cfg->X_slowDistance)
+    goBack(st, pos, cfg->X_minSpeed);
   else
-    goBack(pos, config.X_maxSpeed);
+    goBack(st, pos, cfg->X_maxSpeed);
 }
 
-void goForward(long pos, int speed)
+void goForward(State *st, long pos, int speed)
 {
-  SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + state.X_currentPos + " speed: " + speed);
+  SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 
   digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, HIGH);
   digitalWrite(X_turnBwd, LOW);
-  setSpeed(speed);
-  state.X_destinationPos = pos;
-  state.X_currentDirect = FORWARD;
-  state.X_isStoped = false;
+  setSpeed(st, speed);
+  st->destinationPos = pos;
+  st->currentDirect = FORWARD;
+  st->isStoped = false;
 }
 
-void goBack(long pos, int speed)
+void goBack(State *st, long pos, int speed)
 {
-  SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + state.X_currentPos + " speed: " + speed);
+  SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 
   digitalWrite(p_led, HIGH);
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, HIGH);
-  setSpeed(speed);
-  state.X_destinationPos = pos;
-  state.X_currentDirect = BACKWARD;
-  state.X_isStoped = false;
+  setSpeed(st, speed);
+  st->destinationPos = pos;
+  st->currentDirect = BACKWARD;
+  st->isStoped = false;
 }
 
-void stop(String reason)
+void stop(Config *cfg, State *st, String reason)
 {
   digitalWrite(p_led, LOW);
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, LOW);
-  setSpeed(config.X_maxSpeed);
-  state.X_isStoped = true;
+  setSpeed(st, cfg->X_maxSpeed);
+  st->isStoped = true;
 
-  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + state.X_destinationPos + " current:" + state.X_currentPos);
+  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + st->destinationPos + " current:" + st->currentPos);
 }
 
 int g_lastSpeed = 0;
 
-void setSpeed(int speed)
+void setSpeed(State *st, int speed)
 {
   if (speed != g_lastSpeed)
   {
-    SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + state.X_currentPos);
+    SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + st->currentPos);
     analogWrite(X_enA, speed);
     g_lastSpeed = speed;
   }

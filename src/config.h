@@ -22,5 +22,5 @@ struct Config
   const int Y_stopendProtectDistance = 50;
 };
 
-extern Config config;
+extern Config X_config;
 #endif // _CONFIG_H_

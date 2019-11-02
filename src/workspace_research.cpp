@@ -1,6 +1,6 @@
 #include "header.h"
 
-void startResearch()
+void startResearch(Config *cfg, State *st)
 {
   if (END1 || END2)
   {
@@ -8,52 +8,52 @@ void startResearch()
     return;
   }
   SHOW_MESSAGE("1. Start workspace research. Search left endstop.");
-  state.X_workspaceResearchMode = LEFT_ENDSTOP_SEARCH;
-  goBack(-9999, config.X_maxSpeed);
+  st->workspaceResearchMode = LEFT_ENDSTOP_SEARCH;
+  goBack(st, -9999, cfg->X_maxSpeed);
 }
 
-void foundEndStop()
+void foundEndStop(Config *cfg, State *st)
 {
-  if (state.X_workspaceResearchMode == LEFT_ENDSTOP_SEARCH)
+  if (st->workspaceResearchMode == LEFT_ENDSTOP_SEARCH)
   {
     SHOW_MESSAGE("2. Seek 0");
-    state.X_workspaceResearchMode = SEEK_0;
-    goForward(100, config.X_minSpeed);
+    st->workspaceResearchMode = SEEK_0;
+    goForward(st, 100, cfg->X_minSpeed);
   }
 
-  if (state.X_workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
+  if (st->workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
   {
-    SHOW_MESSAGE((String) "4. right endstop found: " + state.X_currentPos);
+    SHOW_MESSAGE((String) "4. right endstop found: " + st->currentPos);
     SHOW_MESSAGE("4. seek max");
-    state.X_workspaceResearchMode = SEEK_MAX;
-    goBack(state.X_currentPos - 100, config.X_minSpeed);
+    st->workspaceResearchMode = SEEK_MAX;
+    goBack(st, st->currentPos - 100, cfg->X_minSpeed);
   }
 }
 
-void leaveEndStop()
+void leaveEndStop(Config *cfg, State *st)
 {
-  if (state.X_workspaceResearchMode == SEEK_0)
+  if (st->workspaceResearchMode == SEEK_0)
   {
     SHOW_MESSAGE("3. 0 found");
-    state.X_currentPos = -config.X_stopendProtectDistance;
-    state.X_minPos = 0;
-    state.X_isZeroFound = true;
+    st->currentPos = -cfg->X_stopendProtectDistance;
+    st->minPos = 0;
+    st->isZeroFound = true;
 
     SHOW_MESSAGE("3. Search right endstop.");
-    state.X_workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;
-    goForward(9999, config.X_maxSpeed);
+    st->workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;
+    goForward(st, 9999, cfg->X_maxSpeed);
   }
 
-  if (state.X_workspaceResearchMode == SEEK_MAX)
+  if (st->workspaceResearchMode == SEEK_MAX)
   {
-    state.X_maxPos = state.X_currentPos - config.X_stopendProtectDistance;
-    SHOW_MESSAGE((String) "5. Max found: " + state.X_maxPos);
+    st->maxPos = st->currentPos - cfg->X_stopendProtectDistance;
+    SHOW_MESSAGE((String) "5. Max found: " + st->maxPos);
 
     SHOW_MESSAGE("5. end workspace research");
-    state.X_workspaceResearchMode = NO_PROCESS;
-    state.X_isWorkspaceKnown = true;
+    st->workspaceResearchMode = NO_PROCESS;
+    st->isWorkspaceKnown = true;
 
     SHOW_MESSAGE("5. go to 0");
-    goBack(0, config.X_maxSpeed);
+    goBack(st, 0, cfg->X_maxSpeed);
   }
 }

@@ -17,28 +17,28 @@ void parse_my(const char *p)
   } while (NUMERIC(*p));
 
   if (letter == 'X')
-    moveTo(codenum);
+    moveTo(&X_config, &X_state, codenum);
 
   if (letter == 'G')
   {
     if (codenum == 28)
     {
-      if (state.X_isZeroFound)
-        moveTo(0);
+      if (X_state.isZeroFound)
+        moveTo(&X_config, &X_state, 0);
       else
-        startZeroSeek();
+        startZeroSeek(&X_config, &X_state);
     }
 
     if (codenum == 280)
     {
-      if (!state.X_isWorkspaceKnown)
-        startResearch();
+      if (!X_state.isWorkspaceKnown)
+        startResearch(&X_config, &X_state);
       else
-        SHOW_MESSAGE((String) "Workspace alredy known. max=" + state.X_maxPos);
+        SHOW_MESSAGE((String) "Workspace alredy known. max=" + X_state.maxPos);
     }
 
     if (codenum == 281)
-      startResearch();
+      startResearch(&X_config, &X_state);
 
     if (codenum == 555)
     {
@@ -47,7 +47,7 @@ void parse_my(const char *p)
       mon += " X+=";
       mon += (END2 ? "1" : "0");
       SHOW_MESSAGE(mon);
-      SHOW_MESSAGE((String) "position" + state.X_currentPos);
+      SHOW_MESSAGE((String) "position" + X_state.currentPos);
     }
   }
 }

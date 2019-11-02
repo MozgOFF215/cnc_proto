@@ -1,82 +1,66 @@
 #include "header.h"
 #include "controller.h"
 
-struct pidState
-{
-  long prevPos;
-  long prevIntg;
-  long prevE;
-
-  unsigned long prevTime; // µS
-  long prevDeltaTime;
-
-  bool isFirstCycle = true;
-
-  float kP;
-  float kI;
-  float kD;
-};
-
 pidState X_pidState;
 
-void initController()
+void initController(pidState *ps)
 {
-  X_pidState.kP = 1;
+  ps->kP = 1;
 }
 
-void controller()
+void controller(Config *cfg, State *st, pidState *ps)
 {
   // axis X
 
-  if (!state.X_isStoped)
+  if (!st->isStoped)
   {
-    if (state.X_currentPos != state.X_destinationPos)
+    if (st->currentPos != st->destinationPos)
     {
-      pidMV pidpv = getX_MV();
+      pidMV pidpv = getX_MV(cfg, st, ps);
     }
   }
 
   // axis Y
 }
 
-pidMV getX_MV()
+pidMV getX_MV(Config *cfg, State *st, pidState *ps)
 {
   pidMV newMV;
   newMV.direction = FORWARD;
   newMV.pwm = 0;
 
   uint32_t now = micros();
-  uint32_t deltaTime = now - X_pidState.prevTime;
+  uint32_t deltaTime = now - ps->prevTime;
 
-  if (now < X_pidState.prevTime)
+  if (now < ps->prevTime)
   {
     // overflow timer ~50 minuts -> take prev delta
-    deltaTime = X_pidState.prevDeltaTime;
+    deltaTime = ps->prevDeltaTime;
   }
 
-  if (X_pidState.isFirstCycle)
+  if (ps->isFirstCycle)
   {
     // first cycle of regulation
     deltaTime = 0;
   }
 
-  X_pidState.prevTime = now;
-  X_pidState.prevDeltaTime = deltaTime;
+  ps->prevTime = now;
+  ps->prevDeltaTime = deltaTime;
 
-  long e = state.X_destinationPos - state.X_currentPos;
-  if (e == 0 && X_pidState.prevE == 0)
+  long e = st->destinationPos - st->currentPos;
+  if (e == 0 && ps->prevE == 0)
   {
     return newMV;
   }
 
-  float pMV = X_pidState.kP * e;
-  float iMV = X_pidState.prevIntg + X_pidState.kI * deltaTime * e / 1000000; // 1000000 - while µS
+  float pMV = ps->kP * e;
+  float iMV = ps->prevIntg + ps->kI * deltaTime * e / 1000000; // 1000000 - while µS
   float dMV = 0;
   if (deltaTime != 0)
-    dMV = X_pidState.kD * (e - X_pidState.prevE) / deltaTime;
+    dMV = ps->kD * (e - ps->prevE) / deltaTime;
 
-  X_pidState.prevIntg = iMV;
-  X_pidState.prevE = e;
+  ps->prevIntg = iMV;
+  ps->prevE = e;
 
   float MV = pMV + iMV + dMV;
 
@@ -86,8 +70,8 @@ pidMV getX_MV()
   else
     MV = -MV;
 
-  if (MV > config.X_maxSpeed)
-    newMV.pwm = config.X_maxSpeed;
+  if (MV > cfg->X_maxSpeed)
+    newMV.pwm = cfg->X_maxSpeed;
   else
     newMV.pwm = MV;
 

@@ -3,45 +3,24 @@
 
 struct State
 {
-  // X axis
+   long currentPos = 0;
+  long destinationPos = 0;
+  bool isStoped = true;
 
-  long X_currentPos = 0;
-  long X_destinationPos = 0;
-  bool X_isStoped = true;
+  long minPos = -9999;
+  long maxPos = 9999;
 
-  long X_minPos = -9999;
-  long X_maxPos = 9999;
+  bool isWorkspaceKnown = false;
+  bool isZeroFound = false;
 
-  bool X_isWorkspaceKnown = false;
-  bool X_isZeroFound = false;
+  moveDirection currentDirect = FORWARD;
 
-  moveDirection X_currentDirect = FORWARD;
+  search_steps workspaceResearchMode = NO_PROCESS;
+  search_steps zeroSearchMode = NO_PROCESS;
 
-  search_steps X_workspaceResearchMode = NO_PROCESS;
-  search_steps X_zeroSearchMode = NO_PROCESS;
-
-  void (*X_endMovingFunction)();
-
-  // Y axis
-
-  long Y_currentPos = 0;
-  long Y_destinationPos = 0;
-  bool Y_isStoped = true;
-
-  long Y_minPos = -9999;
-  long Y_maxPos = 9999;
-
-  bool Y_isWorkspaceKnown = false;
-  bool Y_isZeroFound = false;
-
-  moveDirection Y_currentDirect = FORWARD;
-
-  search_steps Y_workspaceResearchMode = NO_PROCESS;
-  search_steps Y_zeroSearchMode = NO_PROCESS;
-
-  void (*Y_endMovingFunction)();
+  void (*endMovingFunction)();
 };
 
-extern State state;
+extern State X_state; // Axis X
 
 #endif // _STATE_H_1

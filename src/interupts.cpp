@@ -3,32 +3,32 @@
 
 void initInterrupts()
 {
-  attachInterrupt(X_enc1, encoderInterrupt, CHANGE);
-  attachInterrupt(X_end1, endStopInterrupt, CHANGE);
-  attachInterrupt(X_end2, endStopInterrupt, CHANGE);
+  attachInterrupt(X_enc1, X_encoderInterrupt, CHANGE);
+  attachInterrupt(X_end1, X_endStopInterrupt, CHANGE);
+  attachInterrupt(X_end2, X_endStopInterrupt, CHANGE);
 }
 
-void encoderInterrupt()
+void X_encoderInterrupt()
 {
   if (digitalRead(X_enc1) && digitalRead(X_enc2))
-    state.X_currentPos++;
+    X_state.currentPos++;
   else
-    state.X_currentPos--;
+    X_state.currentPos--;
   if (!digitalRead(X_enc1) && digitalRead(X_enc2))
-    state.X_currentPos--;
+    X_state.currentPos--;
   else
-    state.X_currentPos++;
+    X_state.currentPos++;
 
-  if (state.X_isStoped)
+  if (X_state.isStoped)
     return;
 
-  if (!state.X_isStoped)
+  if (!X_state.isStoped)
   {
-    if (state.X_currentDirect == BACKWARD)
+    if (X_state.currentDirect == BACKWARD)
     {
-      if (state.X_currentPos <= state.X_destinationPos)
+      if (X_state.currentPos <= X_state.destinationPos)
       {
-        stop("c<=r");
+        stop(&X_config, &X_state, "c<=r");
 
         // if (state.X_endMovingFunction != nullptr)
         //   state.X_endMovingFunction();
@@ -36,15 +36,15 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.X_currentPos - state.X_destinationPos) < config.X_slowDistance)
-        setSpeed(config.X_minSpeed);
+      if ((X_state.currentPos - X_state.destinationPos) < X_config.X_slowDistance)
+        setSpeed(&X_state, X_config.X_minSpeed);
     }
 
-    if (state.X_currentDirect == FORWARD)
+    if (X_state.currentDirect == FORWARD)
     {
-      if (state.X_currentPos >= state.X_destinationPos)
+      if (X_state.currentPos >= X_state.destinationPos)
       {
-        stop("c>=r");
+        stop(&X_config, &X_state, "c>=r");
 
         // if (state.X_endMovingFunction != nullptr)
         //   state.X_endMovingFunction();
@@ -52,36 +52,36 @@ void encoderInterrupt()
         return;
       }
 
-      if ((state.X_destinationPos - state.X_currentPos) < config.X_slowDistance)
-        setSpeed(config.X_minSpeed);
+      if ((X_state.destinationPos - X_state.currentPos) < X_config.X_slowDistance)
+        setSpeed(&X_state, X_config.X_minSpeed);
     }
   }
 }
 
-void endStopInterrupt()
+void X_endStopInterrupt()
 {
   if (END1 || END2)
   {
-    stop((String) "endstop" + (END1 ? "1" : "2"));
+    stop(&X_config, &X_state, (String) "endstop" + (END1 ? "1" : "2"));
 
-    if (state.X_workspaceResearchMode != NO_PROCESS)
-      foundEndStop();
-    if (state.X_zeroSearchMode != NO_PROCESS)
-      foundEndStop_0();
+    if (X_state.workspaceResearchMode != NO_PROCESS)
+      foundEndStop(&X_config, &X_state);
+    if (X_state.zeroSearchMode != NO_PROCESS)
+      foundEndStop_0(&X_config, &X_state);
   }
   else
   {
-    if (state.X_workspaceResearchMode == SEEK_0 || state.X_workspaceResearchMode == SEEK_MAX)
+    if (X_state.workspaceResearchMode == SEEK_0 || X_state.workspaceResearchMode == SEEK_MAX)
     {
-      stop("leave endstop");
+      stop(&X_config, &X_state, "leave endstop");
       SHOW_MESSAGE("leave endstop");
-      leaveEndStop();
+      leaveEndStop(&X_config, &X_state);
     }
-    if (state.X_zeroSearchMode == SEEK_0)
+    if (X_state.zeroSearchMode == SEEK_0)
     {
-      stop("leave endstop");
+      stop(&X_config, &X_state, "leave endstop");
       SHOW_MESSAGE("leave endstop");
-      leaveEndStop_0();
+      leaveEndStop_0(&X_config, &X_state);
     }
   }
 }

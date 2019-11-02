@@ -1,9 +1,7 @@
 #ifndef TEST_PC_CPP
 #include <Arduino.h>
 #else
-
 #include "arduino.h"
-
 #endif
 
 #include "enums.h"

@@ -2,7 +2,7 @@
 #define _INTERRUPTS_H_
 
 void initInterrupts();
-void encoderInterrupt();
-void endStopInterrupt();
+void X_encoderInterrupt();
+void X_endStopInterrupt();
 
 #endif // _INTERRUPTS_H_
