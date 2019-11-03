@@ -27,14 +27,14 @@ void controller(Config *cfg, State *st, pidState *ps)
   {
     if (st->currentPos != st->destinationPos)
     {
-      pidMV pidpv = getX_MV(cfg, st, ps);
+      getX_MV(cfg, st, ps);
     }
   }
 
   // axis Y
 }
 
-pidMV getX_MV(Config *cfg, State *st, pidState *ps)
+void getX_MV(Config *cfg, State *st, pidState *ps)
 {
   pidMV newMV;
   newMV.direction = FORWARD;
@@ -53,6 +53,7 @@ pidMV getX_MV(Config *cfg, State *st, pidState *ps)
   {
     // first cycle of regulation
     deltaTime = 0;
+    ps->isFirstCycle = false;
   }
 
   ps->prevTime = now;
@@ -61,7 +62,9 @@ pidMV getX_MV(Config *cfg, State *st, pidState *ps)
   long e = st->destinationPos - st->currentPos;
   if (e == 0 && ps->prevE == 0)
   {
-    return newMV;
+    ps->MV = newMV;
+    stop(cfg, st, "end of moving by PID");
+    return;
   }
 
   float pMV = ps->kP * e;
@@ -86,5 +89,5 @@ pidMV getX_MV(Config *cfg, State *st, pidState *ps)
   else
     newMV.pwm = MV;
 
-  return newMV;
+  ps->MV = newMV;
 }

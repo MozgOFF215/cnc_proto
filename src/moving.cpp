@@ -35,7 +35,11 @@ void moveTo(Config *cfg, State *st, long pos)
 
 void goForward(State *st, long pos, int speed)
 {
+#ifndef TEST_PC_CPP
   SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
+#else
+  printf("Forward to:%d current:%d speed: %d\n", pos, st->currentPos, speed);
+#endif
 
   digitalWrite(X_turnFwd, HIGH);
   digitalWrite(X_turnBwd, LOW);
@@ -47,7 +51,11 @@ void goForward(State *st, long pos, int speed)
 
 void goBack(State *st, long pos, int speed)
 {
+#ifndef TEST_PC_CPP
   SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
+#else
+  printf("Backward to:%d current:%d speed: %d\n", pos, st->currentPos, speed);
+#endif
 
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, HIGH);
@@ -63,8 +71,11 @@ void stop(Config *cfg, State *st, String reason)
   digitalWrite(X_turnBwd, LOW);
   setSpeed(st, cfg->maxSpeed);
   st->isStoped = true;
-
+#ifndef TEST_PC_CPP
   SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + st->destinationPos + " current:" + st->currentPos);
+#else
+  printf("stop. reason: %s\n", reason);
+#endif
 }
 
 int g_lastSpeed = 0;
@@ -73,7 +84,12 @@ void setSpeed(State *st, int speed)
 {
   if (speed != g_lastSpeed)
   {
+#ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + st->currentPos);
+#else
+    printf("--- set speed:%d current:%d\n", speed, st->currentPos);
+#endif
+
     analogWrite(X_enA, speed);
     g_lastSpeed = speed;
   }

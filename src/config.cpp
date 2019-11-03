@@ -3,7 +3,7 @@
 
 Config::Config(const char name[8])
 {
-  for (char i = 0; i < 8; i++)
+  for (int i = 0; i < 8; i++)
     axis_name[i] = name[i];
 }
 

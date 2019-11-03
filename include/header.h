@@ -1,6 +1,7 @@
 #ifndef TEST_PC_CPP
 #include <Arduino.h>
 #else
+#include <stdio.h>
 #include "arduino.h"
 #endif
 

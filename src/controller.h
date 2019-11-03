@@ -26,10 +26,12 @@ public:
   float kP;
   float kI;
   float kD;
+
+  pidMV MV;
 };
 
 void initController(pidState *ps);
-pidMV getX_MV(Config *cfg, State *st, pidState *ps);
+void getX_MV(Config *cfg, State *st, pidState *ps);
 void controller(Config *cfg, State *st, pidState *ps);
 
 extern pidState X_pidState;
