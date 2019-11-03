@@ -23,9 +23,9 @@ void controller(Config *cfg, State *st, pidState *ps)
 {
   // axis X
 
-  if (!st->isStoped)
+  //if (!st->isStoped)
   {
-    if (st->currentPos != st->destinationPos)
+    //if (st->currentPos != st->destinationPos)
     {
       getX_MV(cfg, st, ps);
     }
