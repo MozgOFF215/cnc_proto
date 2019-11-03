@@ -38,7 +38,7 @@ void goForward(State *st, long pos, int speed)
 #ifndef TEST_PC_CPP
   SHOW_MESSAGE((String) "Forward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 #else
-  printf("Forward to:%d current:%d speed: %d\n", pos, st->currentPos, speed);
+  printf("Forward to:%ld current:%ld speed: %d\n", pos, st->currentPos, speed);
 #endif
 
   digitalWrite(X_turnFwd, HIGH);
@@ -54,7 +54,7 @@ void goBack(State *st, long pos, int speed)
 #ifndef TEST_PC_CPP
   SHOW_MESSAGE((String) "Backward to:" + pos + " current:" + st->currentPos + " speed: " + speed);
 #else
-  printf("Backward to:%d current:%d speed: %d\n", pos, st->currentPos, speed);
+  printf("Backward to:%ld current:%ld speed: %d\n", pos, st->currentPos, speed);
 #endif
 
   digitalWrite(X_turnFwd, LOW);
@@ -87,7 +87,7 @@ void setSpeed(State *st, int speed)
 #ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "--- set speed:" + speed + " current:" + st->currentPos);
 #else
-    printf("--- set speed:%d current:%d\n", speed, st->currentPos);
+    printf("--- set speed:%d current:%ld\n", speed, st->currentPos);
 #endif
 
     analogWrite(X_enA, speed);
