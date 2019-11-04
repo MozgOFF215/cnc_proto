@@ -54,7 +54,11 @@ void update_MV(Config *cfg, State *st, pidState *ps)
   }
 
   float pMV = ps->kP * e;
-  float iMV = ps->prevIntg + (deltaTime * e / 1000000.0) * ps->kI; // 1000000 - while µS
+
+  float iMV;
+  float ii = (deltaTime * e / 1000000.0) * ps->kI;
+  iMV = ps->prevIntg + ii; // 1000000 - while µS
+
   float dMV = 0;
   if (deltaTime != 0)
   {
