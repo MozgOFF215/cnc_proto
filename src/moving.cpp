@@ -10,7 +10,7 @@ void moveTo(Config *cfg, State *st, long pos)
   {
     if (END2)
     {
-      SHOW_MESSAGE("enstop2 active!!!");
+      SHOW_MESSAGE("endstop2 active!!!");
       return;
     }
 
@@ -23,7 +23,7 @@ void moveTo(Config *cfg, State *st, long pos)
 
   if (END1)
   {
-    SHOW_MESSAGE("enstop1 active!!!");
+    SHOW_MESSAGE("endstop1 active!!!");
     return;
   }
 
@@ -67,15 +67,16 @@ void goBack(State *st, long pos, int speed)
 
 void stop(Config *cfg, State *st, String reason)
 {
+#ifndef TEST_PC_CPP
+  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + st->destinationPos + " current:" + st->currentPos);
+#else
+  if (!no_prompt)
+    printf("stop. reason: %s\n", reason);
+#endif
   digitalWrite(X_turnFwd, LOW);
   digitalWrite(X_turnBwd, LOW);
   setSpeed(st, cfg->maxSpeed);
   st->isStoped = true;
-#ifndef TEST_PC_CPP
-  SHOW_MESSAGE((String) "Stop" + (reason.length() > 0 ? "(" + reason + ")" : "") + ". Required:" + st->destinationPos + " current:" + st->currentPos);
-#else
-  printf("stop. reason: %s\n", reason);
-#endif
 }
 
 int g_lastSpeed = 0;

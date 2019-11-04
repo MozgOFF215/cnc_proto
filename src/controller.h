@@ -15,8 +15,8 @@ public:
   char axis_name[8];
 
   long prevPos;
-  long prevIntg;
   long prevE;
+  float prevIntg;
 
   unsigned long prevTime; // µS
   long prevDeltaTime;
@@ -31,8 +31,9 @@ public:
 };
 
 void initController(pidState *ps);
-void getX_MV(Config *cfg, State *st, pidState *ps);
 void controller(Config *cfg, State *st, pidState *ps);
+void update_MV(Config *cfg, State *st, pidState *ps);
+void apply_MV(Config *cfg, State *st, pidState *ps);
 
 extern pidState X_pidState;
 
