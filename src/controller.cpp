@@ -11,7 +11,7 @@ pidState X_pidState("Axis X");
 void initController(pidState *ps)
 {
   ps->kP = 1;
-  ps->kI = 0.1;
+  ps->kI = 0;
 }
 
 void controller(Config *cfg, State *st, pidState *ps)

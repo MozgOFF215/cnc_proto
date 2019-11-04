@@ -12,7 +12,7 @@ void setup()
   pinMode(X_end1, INPUT_PULLUP);
   pinMode(X_end2, INPUT_PULLUP);
 
-  //initController();
+  initController(&X_pidState);
 
   initInterrupts();
 
@@ -44,5 +44,5 @@ void loop()
     inputString = "";
   }
 
-  //controller();
+  controller(&X_config, &X_state, &X_pidState);
 }
