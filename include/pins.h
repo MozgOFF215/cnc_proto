@@ -10,7 +10,7 @@
 #define X_turnBwd PIN_C7
 
 #define X_enc1 PIN_D2 // encoder 1 (INT)
-#define X_enc2 PIN_D4 // encoder 2 (no INT) (previously had D3!!!)
+#define X_enc2 PIN_D4 // encoder 2 (no INT)
 
 #define X_end1 PIN_D0 // endstop - (INT)
 #define X_end2 PIN_D1 // endstop + (INT)
@@ -28,6 +28,6 @@
 #define Y_end1 PIN_E6 // endstop - (INT)
 #define Y_end2 PIN_E7 // endstop + (INT)
 
-#define Y_enB PIN_B5 // ENA (PWM for motor A)
+#define Y_enB PIN_B5 // ENA (PWM for motor B)
 
 #endif // _PINS_H_

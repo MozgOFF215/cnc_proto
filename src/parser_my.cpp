@@ -16,9 +16,9 @@ void parse_my(const char *p)
     codenum += *p++ - '0';
   } while (NUMERIC(*p));
 
-  if (letter == 'X')
-    moveTo(&X_config, &X_state, codenum);
-
+  if (letter == 'X') // moveTo(&X_config, &X_state, codenum); - this is old!
+    X_state.currentPos = codenum;
+    
   if (letter == 'G')
   {
     if (codenum == 28)
