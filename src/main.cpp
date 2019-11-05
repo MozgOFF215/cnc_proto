@@ -40,7 +40,7 @@ void loop()
   {
     SHOW_MESSAGE("command: " + inputString);
     stringComplete = false;
-    parse_my(inputString.toUpperCase().c_str());
+    parse_my(inputString.c_str());
     inputString = "";
   }
 

@@ -1,27 +1,56 @@
 #include "header.h"
-#include "main.h"
 
-void parse_my(const char *p)
+parserCode getCode(const char *p)
 {
+  parserCode result;
+  result.letter = '?';
+  result.codenum = 0;
+  result.pNextSymbol = nullptr;
+
+  if (*p == 0)
+    return result;
+
   // Skip spaces
   while (*p == ' ')
     ++p;
 
-  const char letter = *p++;
+  if (*p == 0)
+    return result;
+
+  const char letter = *p >= 'a' && *p <= 'z' ? *p & 0xDF : *p; // to upper case
+  p++;
 
   int codenum = 0;
-  do
-  {
-    codenum *= 10;
-    codenum += *p++ - '0';
-  } while (NUMERIC(*p));
+  if (NUMERIC(*p))
+    do
+    {
+      codenum *= 10;
+      codenum += *p++ - '0';
+    } while (NUMERIC(*p));
 
-  if (letter == 'X') // moveTo(&X_config, &X_state, codenum); - this is old!
-    X_state.currentPos = codenum;
-    
-  if (letter == 'G')
+  result.letter = letter;
+  result.codenum = codenum;
+
+  if (*p != 0)
+    result.pNextSymbol = p;
+
+  if (*p == 0)
+    return result;
+
+  return result;
+}
+
+void parse_my(const char *p)
+{
+  parserCode c = getCode(p);
+
+  if (c.letter == 'X') // moveTo(&X_config, &X_state, codenum); - this is old!
+    X_state.currentPos = c.codenum;
+
+  if (c.letter == 'G')
   {
-    if (codenum == 28)
+#ifndef TEST_PC_CPP
+    if (c.codenum == 28)
     {
       if (X_state.isZeroFound)
         moveTo(&X_config, &X_state, 0);
@@ -29,7 +58,7 @@ void parse_my(const char *p)
         startZeroSeek(&X_config, &X_state);
     }
 
-    if (codenum == 280)
+    if (c.codenum == 280)
     {
       if (!X_state.isWorkspaceKnown)
         startResearch(&X_config, &X_state);
@@ -37,17 +66,23 @@ void parse_my(const char *p)
         SHOW_MESSAGE((String) "Workspace alredy known. max=" + X_state.maxPos);
     }
 
-    if (codenum == 281)
+    if (c.codenum == 281)
       startResearch(&X_config, &X_state);
+#endif
 
-    if (codenum == 555)
+    if (c.codenum == 555)
     {
+#ifndef TEST_PC_CPP
       String mon = "endstops: X-=";
       mon += (END1 ? "1" : "0");
       mon += " X+=";
       mon += (END2 ? "1" : "0");
       SHOW_MESSAGE(mon);
       SHOW_MESSAGE((String) "position" + X_state.currentPos);
+#else
+      printf("endstops: X-=%s X+=%s", END1 ? "ON" : "OFF", END2 ? "ON" : "OFF");
+      printf("position %ld", X_state.currentPos);
+#endif
     }
   }
 }
