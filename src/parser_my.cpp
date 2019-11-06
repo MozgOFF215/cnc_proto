@@ -45,7 +45,7 @@ void parse_my(const char *p)
   parserCode c = getCode(p);
 
   if (c.letter == 'X') // moveTo(&X_config, &X_state, codenum); - this is old!
-    X_state.currentPos = c.codenum;
+    X_state.destinationPos = c.codenum;
 
   if (c.letter == 'G')
   {
@@ -53,7 +53,7 @@ void parse_my(const char *p)
     if (c.codenum == 28)
     {
       if (X_state.isZeroFound)
-        moveTo(&X_config, &X_state, 0);
+        X_state.destinationPos = 0l;
       else
         startZeroSeek(&X_config, &X_state);
     }
@@ -74,13 +74,13 @@ void parse_my(const char *p)
     {
 #ifndef TEST_PC_CPP
       String mon = "endstops: X-=";
-      mon += (END1 ? "1" : "0");
+      mon += (X_config.IsEndMinus() ? "1" : "0");
       mon += " X+=";
-      mon += (END2 ? "1" : "0");
+      mon += (X_config.IsEndPlus() ? "1" : "0");
       SHOW_MESSAGE(mon);
       SHOW_MESSAGE((String) "position" + X_state.currentPos);
 #else
-      printf("endstops: X-=%s X+=%s", END1 ? "ON" : "OFF", END2 ? "ON" : "OFF");
+      printf("endstops: X-=%s X+=%s", X_config.IsEndMinus() ? "ON" : "OFF", X_config.IsEndPlus() ? "ON" : "OFF");
       printf("position %ld", X_state.currentPos);
 #endif
     }

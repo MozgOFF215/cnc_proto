@@ -3,14 +3,18 @@
 
 struct pidMV
 {
-  byte pwm;
+  long pwm;
   moveDirection direction;
 };
 
 class pidState
 {
 public:
-  pidState(const char name[8]);
+  pidState(const char name[8])
+  {
+    for (int i = 0; i < 8; i++)
+      axis_name[i] = name[i];
+  }
 
   char axis_name[8];
 

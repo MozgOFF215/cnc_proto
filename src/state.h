@@ -4,9 +4,9 @@
 class State
 {
 public:
+  char axis_name[8];
   State(const char name[8]);
 
-  char axis_name[8];
   long currentPos = 0;
   long destinationPos = 0;
   bool isStoped = true;

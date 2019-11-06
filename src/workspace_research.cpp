@@ -2,14 +2,14 @@
 
 void startResearch(Config *cfg, State *st)
 {
-  if (END1 || END2)
+  if (cfg->IsEndMinus() || cfg->IsEndPlus())
   {
     SHOW_MESSAGE("not possible to research: need to leave the endstops");
     return;
   }
   SHOW_MESSAGE("1. Start workspace research. Search left endstop.");
   st->workspaceResearchMode = LEFT_ENDSTOP_SEARCH;
-  goBack(st, -9999, cfg->maxSpeed);
+  st->destinationPos = -9999;
 }
 
 void foundEndStop(Config *cfg, State *st)
@@ -18,7 +18,7 @@ void foundEndStop(Config *cfg, State *st)
   {
     SHOW_MESSAGE("2. Seek 0");
     st->workspaceResearchMode = SEEK_0;
-    goForward(st, 100, cfg->minSpeed);
+    st->destinationPos = 100;
   }
 
   if (st->workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
@@ -26,7 +26,7 @@ void foundEndStop(Config *cfg, State *st)
     SHOW_MESSAGE((String) "4. right endstop found: " + st->currentPos);
     SHOW_MESSAGE("4. seek max");
     st->workspaceResearchMode = SEEK_MAX;
-    goBack(st, st->currentPos - 100, cfg->minSpeed);
+    st->destinationPos = st->currentPos - 100;
   }
 }
 
@@ -41,7 +41,7 @@ void leaveEndStop(Config *cfg, State *st)
 
     SHOW_MESSAGE("3. Search right endstop.");
     st->workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;
-    goForward(st, 9999, cfg->maxSpeed);
+    st->destinationPos = 9999;
   }
 
   if (st->workspaceResearchMode == SEEK_MAX)
@@ -54,6 +54,6 @@ void leaveEndStop(Config *cfg, State *st)
     st->isWorkspaceKnown = true;
 
     SHOW_MESSAGE("5. go to 0");
-    goBack(st, 0, cfg->maxSpeed);
+    st->destinationPos = 0;
   }
 }

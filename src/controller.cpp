@@ -1,17 +1,15 @@
 #include "header.h"
 #include "controller.h"
+#include "math.h"
 
-pidState::pidState(const char name[8])
-{
-  for (int i = 0; i < 8; i++)
-    axis_name[i] = name[i];
-}
+
 pidState X_pidState("Axis X");
 
 void initController(pidState *ps)
 {
-  ps->kP = 1;
+  ps->kP = 0.1;
   ps->kI = 0;
+  ps->kD = 0;
 }
 
 void controller(Config *cfg, State *st, pidState *ps)
@@ -46,12 +44,6 @@ void update_MV(Config *cfg, State *st, pidState *ps)
   ps->prevDeltaTime = deltaTime;
 
   long e = st->destinationPos - st->currentPos;
-  if (e == 0 && ps->prevE == 0)
-  {
-    ps->MV = newMV;
-    stop(cfg, st, "end of moving by PID");
-    return;
-  }
 
   float pMV = ps->kP * e;
 
@@ -93,22 +85,26 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
       st->isStoped = false;
   }
 
-  if (ps->MV.pwm > 0)
+  if (ps->MV.pwm == 0)
   {
-    if (ps->MV.pwm > cfg->maxSpeed)
-      analogWrite(X_enA, cfg->maxSpeed);
-    else
-      analogWrite(X_enA, ps->MV.pwm);
-
-    if (ps->MV.direction == FORWARD)
-    {
-      digitalWrite(X_turnFwd, HIGH);
-      digitalWrite(X_turnBwd, LOW);
-    }
-    else
-    {
-      digitalWrite(X_turnFwd, LOW);
-      digitalWrite(X_turnBwd, HIGH);
-    }
+    cfg->SetPWM(0);
   }
+  else
+  {
+    int mv = ps->MV.pwm;
+    if (mv < cfg->minSpeed)
+      mv = cfg->minSpeed;
+
+    SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
+
+    if (mv > cfg->maxSpeed)
+      cfg->SetPWM(cfg->maxSpeed);
+    else
+      cfg->SetPWM(mv);
+  }
+
+  if (ps->MV.direction == FORWARD)
+    cfg->TurnFWD();
+  else
+    cfg->TurnBWD();
 }

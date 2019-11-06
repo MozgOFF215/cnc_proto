@@ -19,6 +19,7 @@ void X_encoderInterrupt()
   else
     X_state.currentPos++;
 
+/*      
   if (X_state.isStoped)
     return;
 
@@ -56,13 +57,14 @@ void X_encoderInterrupt()
         setSpeed(&X_state, X_config.minSpeed);
     }
   }
+*/
 }
 
 void X_endStopInterrupt()
 {
-  if (END1 || END2)
+  if (X_config.IsEndMinus() || X_config.IsEndPlus())
   {
-    stop(&X_config, &X_state, (String) "endstop" + (END1 ? "1" : "2"));
+    X_config.Stop(&X_state, (String) "endstop" + (X_config.IsEndMinus() ? "1" : "2"));
 
     if (X_state.workspaceResearchMode != NO_PROCESS)
       foundEndStop(&X_config, &X_state);
@@ -73,13 +75,13 @@ void X_endStopInterrupt()
   {
     if (X_state.workspaceResearchMode == SEEK_0 || X_state.workspaceResearchMode == SEEK_MAX)
     {
-      stop(&X_config, &X_state, "leave endstop");
+      X_config.Stop(&X_state, "leave endstop");
       SHOW_MESSAGE("leave endstop");
       leaveEndStop(&X_config, &X_state);
     }
     if (X_state.zeroSearchMode == SEEK_0)
     {
-      stop(&X_config, &X_state, "leave endstop");
+      X_config.Stop(&X_state, "leave endstop");
       SHOW_MESSAGE("leave endstop");
       leaveEndStop_0(&X_config, &X_state);
     }
