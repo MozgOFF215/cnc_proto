@@ -31,6 +31,11 @@ void setup()
 
   X_state.endMovingFunction = nullptr;
 
+  if (!X_config.IsEndMinus() && !X_config.IsEndPlus())
+  {
+    X_state.isStoped = false;
+  }
+
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
 }

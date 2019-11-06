@@ -17,50 +17,11 @@ void X_encoderInterrupt()
     X_state.currentPos++;
   else
     X_state.currentPos--;
+  
   if (!digitalRead(X_enc1) && digitalRead(X_enc2))
     X_state.currentPos--;
   else
     X_state.currentPos++;
-
-  /*      
-  if (X_state.isStoped)
-    return;
-
-  if (!X_state.isStoped)
-  {
-    if (X_state.currentDirect == BACKWARD)
-    {
-      if (X_state.currentPos <= X_state.destinationPos)
-      {
-        stop(&X_config, &X_state, "c<=r");
-
-        // if (state.X_endMovingFunction != nullptr)
-        //   state.X_endMovingFunction();
-
-        return;
-      }
-
-      if ((X_state.currentPos - X_state.destinationPos) < X_config.slowDistance)
-        setSpeed(&X_state, X_config.minSpeed);
-    }
-
-    if (X_state.currentDirect == FORWARD)
-    {
-      if (X_state.currentPos >= X_state.destinationPos)
-      {
-        stop(&X_config, &X_state, "c>=r");
-
-        // if (state.X_endMovingFunction != nullptr)
-        //   state.X_endMovingFunction();
-
-        return;
-      }
-
-      if ((X_state.destinationPos - X_state.currentPos) < X_config.slowDistance)
-        setSpeed(&X_state, X_config.minSpeed);
-    }
-  }
-*/
 }
 
 void X_endStopInterrupt()

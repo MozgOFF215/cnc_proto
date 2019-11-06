@@ -11,7 +11,7 @@ public:
 
   long currentPos = 0;
   long destinationPos = 0;
-  bool isStoped = true;
+  bool isStoped = true; // starting value = true
 
   long minPos = -9999;
   long maxPos = 9999;

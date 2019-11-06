@@ -75,39 +75,69 @@ void update_MV(Config *cfg, State *st, pidState *ps)
 
 void apply_MV(Config *cfg, State *st, pidState *ps)
 {
-  // TODO check endstops
+  int mv = 0;
 
-  if (st->isStoped)
+  if (ps->MV.pwm != 0)
   {
-    if (ps->MV.pwm > 0)
-      st->isStoped = false;
-  }
-
-  if (ps->MV.pwm == 0)
-  {
-    cfg->SetPWM(0);
-  }
-  else
-  {
-    int mv = ps->MV.pwm;
+    mv = ps->MV.pwm;
     if (mv < cfg->minSpeed)
       mv = cfg->minSpeed;
 
 #ifndef TEST_PC_CPP
-    SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
+    //SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
 #else
     if (!no_prompt)
       printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm), ps->prevE);
 #endif
 
     if (mv > cfg->maxSpeed)
-      cfg->SetPWM(cfg->maxSpeed);
-    else
-      cfg->SetPWM(mv);
+      mv = cfg->maxSpeed;
   }
 
   if (ps->MV.direction == FORWARD)
-    cfg->TurnFWD();
+  {
+    if (!st->isStoped)
+    {
+      cfg->SetPWM(mv);
+      cfg->TurnFWD();
+    }
+    else
+    {
+      if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
+      {
+        st->isStoped=0;
+      }
+      else
+      {
+        if (!cfg->IsEndPlus())
+        {
+          cfg->SetPWM(mv);
+          cfg->TurnFWD();
+        }
+      }
+    }
+  }
   else
-    cfg->TurnBWD();
+  {
+    if (!st->isStoped)
+    {
+      cfg->SetPWM(mv);
+      cfg->TurnBWD();
+    }
+    else
+    {
+      if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
+      {
+        st->isStoped=0;
+      }
+      else
+      {
+        if (!cfg->IsEndMinus())
+        {
+          cfg->SetPWM(mv);
+          cfg->TurnBWD();
+        }
+      }
+    }
+  }
 }
