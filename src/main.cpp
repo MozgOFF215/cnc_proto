@@ -1,4 +1,15 @@
-#include "header.h"
+#ifndef TEST_PC_CPP
+#include <Arduino.h>
+#else
+#include "arduino.h"
+#endif
+
+#include "macros.h"
+#include "pins.h"
+#include "main.h"
+#include "interrupts.h"
+#include "controller.h"
+#include "parser_my.h"
 
 String inputString = "";     // a String to hold incoming data
 bool stringComplete = false; // whether the string is complete
@@ -38,7 +49,12 @@ void loop()
 
   if (stringComplete)
   {
+#ifndef TEST_PC_CPP
     SHOW_MESSAGE("command: " + inputString);
+#else
+    printf("command: %s", inputString);
+#endif
+
     stringComplete = false;
     parse_my(inputString.c_str());
     inputString = "";

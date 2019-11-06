@@ -1,6 +1,10 @@
 #ifndef _CONTROLLER_H_
 #define _CONTROLLER_H_
 
+#include "state.h"
+#include "config.h"
+#include "enums.h"
+
 struct pidMV
 {
   long pwm;

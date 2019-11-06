@@ -1,5 +1,8 @@
-#include "header.h"
 #include "interrupts.h"
+#include "pins.h"
+#include "state.h"
+#include "seek_0.h"
+#include "workspace_research.h"
 
 void initInterrupts()
 {
@@ -19,7 +22,7 @@ void X_encoderInterrupt()
   else
     X_state.currentPos++;
 
-/*      
+  /*      
   if (X_state.isStoped)
     return;
 
@@ -64,7 +67,7 @@ void X_endStopInterrupt()
 {
   if (X_config.IsEndMinus() || X_config.IsEndPlus())
   {
-    X_config.Stop(&X_state, (String) "endstop" + (X_config.IsEndMinus() ? "1" : "2"));
+    X_config.Stop(&X_state, X_config.IsEndMinus() ? "endstop '-' activate!" : "endstop '+' activate!");
 
     if (X_state.workspaceResearchMode != NO_PROCESS)
       foundEndStop(&X_config, &X_state);

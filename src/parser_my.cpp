@@ -1,4 +1,8 @@
-#include "header.h"
+#include "parser_my.h"
+#include "state.h"
+#include "config.h"
+#include "workspace_research.h"
+#include "seek_0.h"
 
 parserCode getCode(const char *p)
 {

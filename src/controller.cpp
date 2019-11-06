@@ -1,7 +1,5 @@
-#include "header.h"
 #include "controller.h"
 #include "math.h"
-
 
 pidState X_pidState("Axis X");
 
@@ -95,7 +93,12 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
     if (mv < cfg->minSpeed)
       mv = cfg->minSpeed;
 
+#ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
+#else
+    if (!no_prompt)
+      printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm), ps->prevE);
+#endif
 
     if (mv > cfg->maxSpeed)
       cfg->SetPWM(cfg->maxSpeed);

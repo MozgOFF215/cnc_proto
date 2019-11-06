@@ -1,4 +1,3 @@
-#include "header.h"
 #include "state.h"
 
 State::State(const char name[8])

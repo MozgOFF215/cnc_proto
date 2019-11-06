@@ -1,4 +1,5 @@
-#include "header.h"
+#include "macros.h"
+#include "seek_0.h"
 
 void startZeroSeek(Config *cfg, State *st)
 {

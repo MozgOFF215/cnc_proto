@@ -1,6 +1,8 @@
 #ifndef _STATE_H_1
 #define _STATE_H_1
 
+#include "enums.h"
+
 class State
 {
 public:

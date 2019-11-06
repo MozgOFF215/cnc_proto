@@ -1,4 +1,4 @@
-#include "header.h"
+#include "workspace_research.h"
 
 void startResearch(Config *cfg, State *st)
 {
@@ -23,7 +23,11 @@ void foundEndStop(Config *cfg, State *st)
 
   if (st->workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
   {
+#ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "4. right endstop found: " + st->currentPos);
+#else
+    printf("4. right endstop found: %ld\n", st->currentPos);
+#endif
     SHOW_MESSAGE("4. seek max");
     st->workspaceResearchMode = SEEK_MAX;
     st->destinationPos = st->currentPos - 100;
@@ -47,7 +51,11 @@ void leaveEndStop(Config *cfg, State *st)
   if (st->workspaceResearchMode == SEEK_MAX)
   {
     st->maxPos = st->currentPos - cfg->stopendProtectDistance;
+#ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "5. Max found: " + st->maxPos);
+#else
+    printf("5. Max found: %ld", st->maxPos);
+#endif
 
     SHOW_MESSAGE("5. end workspace research");
     st->workspaceResearchMode = NO_PROCESS;
