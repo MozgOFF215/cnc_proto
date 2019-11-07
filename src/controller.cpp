@@ -6,7 +6,7 @@ pidState X_pidState("Axis X");
 void initController(pidState *ps)
 {
   ps->kP = 0.1;
-  ps->kI = 0;
+  ps->kI = 1;
   ps->kD = 0;
 }
 
@@ -23,12 +23,12 @@ void update_MV(Config *cfg, State *st, pidState *ps)
   newMV.pwm = 0;
 
   uint32_t now = micros();
-  uint32_t deltaTime = now - ps->prevTime;
+  double deltaTime = now - ps->ts;
 
-  if (now < ps->prevTime)
+  if (now < ps->ts)
   {
     // overflow timer ~50 minuts -> take prev delta
-    deltaTime = ps->prevDeltaTime;
+    deltaTime = ps->dt;
   }
 
   if (ps->isFirstCycle)
@@ -38,27 +38,29 @@ void update_MV(Config *cfg, State *st, pidState *ps)
     ps->isFirstCycle = false;
   }
 
-  ps->prevTime = now;
-  ps->prevDeltaTime = deltaTime;
+  ps->ts = now;
+  ps->dt = deltaTime;
 
   long e = st->destinationPos - st->currentPos;
 
   double pMV = ps->kP * e;
 
   double iMV;
-  double ii = (deltaTime * e / 1000000.0) * ps->kI;
-  iMV = ps->prevIntg + ii; // 1000000 - while µS
+  double ii = (deltaTime * e / 1000000.0) * ps->kI; // 1000000 - while µS
+  iMV = ps->iMV + ii;
 
   double dMV = 0;
   if (deltaTime != 0)
   {
-    long de = e - ps->prevE;
+    long de = e - ps->e;
     if (de != 0)
-      dMV = ps->kD * (e - ps->prevE) / deltaTime;
+      dMV = ps->kD * (e - ps->e) / deltaTime * 1000000.0;
   }
 
-  ps->prevIntg = iMV;
-  ps->prevE = e;
+  ps->pMV = pMV;
+  ps->iMV = iMV;
+  ps->dMV = dMV;
+  ps->e = e;
 
   double MV = pMV + iMV + dMV;
 
@@ -84,10 +86,10 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
       mv = cfg->minSpeed;
 
 #ifndef TEST_PC_CPP
-    //SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
+      //SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
 #else
     if (!no_prompt)
-      printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm), ps->prevE);
+      printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm), ps->e);
 #endif
 
     if (mv > cfg->maxSpeed)
@@ -105,7 +107,7 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
     {
       if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
       {
-        st->isStoped=0;
+        st->isStoped = 0;
       }
       else
       {
@@ -128,7 +130,7 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
     {
       if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
       {
-        st->isStoped=0;
+        st->isStoped = 0;
       }
       else
       {

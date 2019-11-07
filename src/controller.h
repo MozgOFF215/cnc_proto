@@ -22,12 +22,14 @@ public:
 
   char axis_name[8];
 
-  long prevPos;
-  long prevE;
-  double prevIntg;
+  long position;
+  long e;
+  double pMV;
+  double iMV;
+  double dMV;
 
-  unsigned long prevTime; // µS
-  long prevDeltaTime;
+  unsigned long ts; // time stamp µS
+  long dt;          // delta time
 
   bool isFirstCycle = true;
 
