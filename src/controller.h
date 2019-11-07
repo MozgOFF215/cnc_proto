@@ -24,16 +24,16 @@ public:
 
   long prevPos;
   long prevE;
-  float prevIntg;
+  double prevIntg;
 
   unsigned long prevTime; // µS
   long prevDeltaTime;
 
   bool isFirstCycle = true;
 
-  float kP;
-  float kI;
-  float kD;
+  double kP;
+  double kI;
+  double kD;
 
   pidMV MV;
 };

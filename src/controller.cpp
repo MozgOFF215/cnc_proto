@@ -43,13 +43,13 @@ void update_MV(Config *cfg, State *st, pidState *ps)
 
   long e = st->destinationPos - st->currentPos;
 
-  float pMV = ps->kP * e;
+  double pMV = ps->kP * e;
 
-  float iMV;
-  float ii = (deltaTime * e / 1000000.0) * ps->kI;
+  double iMV;
+  double ii = (deltaTime * e / 1000000.0) * ps->kI;
   iMV = ps->prevIntg + ii; // 1000000 - while µS
 
-  float dMV = 0;
+  double dMV = 0;
   if (deltaTime != 0)
   {
     long de = e - ps->prevE;
@@ -60,7 +60,7 @@ void update_MV(Config *cfg, State *st, pidState *ps)
   ps->prevIntg = iMV;
   ps->prevE = e;
 
-  float MV = pMV + iMV + dMV;
+  double MV = pMV + iMV + dMV;
 
   newMV.direction = BACKWARD;
   if (MV >= 0)
