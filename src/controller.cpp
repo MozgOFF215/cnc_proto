@@ -6,7 +6,7 @@ pidState X_pidState("Axis X");
 void initController(pidState *ps)
 {
   ps->kP = 0.1;
-  ps->kI = 1;
+  ps->kI = 0;
   ps->kD = 0;
 }
 
