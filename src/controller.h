@@ -2,50 +2,12 @@
 #define _CONTROLLER_H_
 
 #include "state.h"
-#include "config.h"
 #include "enums.h"
 
-struct pidMV
-{
-  long pwm;
-  moveDirection direction;
-};
-
-class pidState
-{
-public:
-  pidState(const char name[8])
-  {
-    for (int i = 0; i < 8; i++)
-      axis_name[i] = name[i];
-  }
-
-  char axis_name[8];
-
-  long position;
-  long e;
-  double pMV;
-  double iMV;
-  double dMV;
-
-  unsigned long ts; // time stamp µS
-  long dt;          // delta time
-
-  bool isFirstCycle = true;
-
-  double kP;
-  double kI;
-  double kD;
-
-  pidMV MV;
-};
-
-void initControllerX(pidState *ps);
-void controller(Config *cfg, State *st, pidState *ps);
-void update_MV(Config *cfg, State *st, pidState *ps);
-void apply_MV(Config *cfg, State *st, pidState *ps);
-
-extern pidState X_pidState;
-extern pidState Y_pidState;
+void initControllerX();
+void initControllerY();
+void controller(State *st);
+void update_MV(State *st);
+void apply_MV(State *st);
 
 #endif // _CONTROLLER_H_

@@ -2,10 +2,9 @@
 #define _WORKSPACE_RESEARCH_H_
 
 #include "state.h"
-#include "config.h"
 
-void startResearch(Config *cfg, State *st);
-void foundEndStop(Config *cfg, State *st);
-void leaveEndStop(Config *cfg, State *st);
+void startResearch(State *st);
+void foundEndStop(State *st);
+void leaveEndStop(State *st);
 
 #endif // _WORKSPACE_RESEARCH_H_

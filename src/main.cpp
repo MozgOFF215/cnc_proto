@@ -30,8 +30,8 @@ void setup()
   pinMode(Y_end1, INPUT_PULLUP);
   pinMode(Y_end2, INPUT_PULLUP);
 
-  initControllerX(&X_pidState);
-  initControllerX(&Y_pidState);
+  initControllerX();
+  initControllerY();
 
   initInterrupts();
 
@@ -39,7 +39,7 @@ void setup()
 
   X_state.endMovingFunction = nullptr;
 
-  if (!X_config.IsEndMinus() && !X_config.IsEndPlus())
+  if (!X_state.IsEndMinus() && !X_state.IsEndPlus())
   {
     X_state.isStoped = false;
   }
@@ -73,6 +73,6 @@ void loop()
     inputString = "";
   }
 
-  controller(&X_config, &X_state, &X_pidState);
-  controller(&Y_config, &Y_state, &Y_pidState);
+  controller(&X_state);
+  controller(&Y_state);
 }

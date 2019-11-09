@@ -1,8 +1,8 @@
 #include "workspace_research.h"
 
-void startResearch(Config *cfg, State *st)
+void startResearch(State *st)
 {
-  if (cfg->IsEndMinus() || cfg->IsEndPlus())
+  if (st->IsEndMinus() || st->IsEndPlus())
   {
     SHOW_MESSAGE("not possible to research: need to leave the endstops");
     return;
@@ -12,7 +12,7 @@ void startResearch(Config *cfg, State *st)
   st->destinationPos = -9999;
 }
 
-void foundEndStop(Config *cfg, State *st)
+void foundEndStop(State *st)
 {
   if (st->workspaceResearchMode == LEFT_ENDSTOP_SEARCH)
   {
@@ -34,12 +34,12 @@ void foundEndStop(Config *cfg, State *st)
   }
 }
 
-void leaveEndStop(Config *cfg, State *st)
+void leaveEndStop(State *st)
 {
   if (st->workspaceResearchMode == SEEK_0)
   {
     SHOW_MESSAGE("3. 0 found");
-    st->currentPos = -cfg->stopendProtectDistance;
+    st->currentPos = -st->stopendProtectDistance;
     st->minPos = 0;
     st->isZeroFound = true;
 
@@ -50,7 +50,7 @@ void leaveEndStop(Config *cfg, State *st)
 
   if (st->workspaceResearchMode == SEEK_MAX)
   {
-    st->maxPos = st->currentPos - cfg->stopendProtectDistance;
+    st->maxPos = st->currentPos - st->stopendProtectDistance;
 #ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "5. Max found: " + st->maxPos);
 #else

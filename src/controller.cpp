@@ -1,73 +1,70 @@
 #include "controller.h"
 #include "math.h"
 
-pidState X_pidState("Axis X");
-pidState Y_pidState("Axis Y");
-
-void initControllerX(pidState *ps)
+void initControllerX()
 {
-  ps->kP = 0.2;
-  ps->kI = 0;
-  ps->kD = 0;
+  X_state.kP = 0.2;
+  X_state.kI = 0;
+  X_state.kD = 0;
 }
 
-void initControllerY(pidState *ps)
+void initControllerY()
 {
-  ps->kP = 0.1;
-  ps->kI = 0;
-  ps->kD = 0;
+  Y_state.kP = 0.1;
+  Y_state.kI = 0;
+  Y_state.kD = 0;
 }
 
-void controller(Config *cfg, State *st, pidState *ps)
+void controller(State *st)
 {
-  update_MV(cfg, st, ps);
-  apply_MV(cfg, st, ps);
+  update_MV(st);
+  apply_MV(st);
 }
 
-void update_MV(Config *cfg, State *st, pidState *ps)
+void update_MV(State *st)
 {
   pidMV newMV;
   newMV.direction = FORWARD;
   newMV.pwm = 0;
 
   uint32_t now = micros();
-  double deltaTime = now - ps->ts;
+  double deltaTime = now - st->ts;
 
-  if (now < ps->ts)
+  if (now < st->ts)
   {
     // overflow timer ~50 minuts -> take prev delta
-    deltaTime = ps->dt;
+    deltaTime = st->dt;
   }
 
-  if (ps->isFirstCycle)
+  if (st->isFirstCycle)
   {
     // first cycle of regulation
     deltaTime = 0;
   }
 
-  ps->ts = now;
-  ps->dt = deltaTime;
+  st->ts = now;
+  st->dt = deltaTime;
 
   long e = st->destinationPos - st->currentPos;
 
-  double pMV = ps->kP * e;
+  double pMV = st->kP * e;
 
   double iMV;
-  double ii = (deltaTime * e / 1000000.0) * ps->kI; // 1000000 - while µS
-  iMV = ps->iMV + ii;
+  double ii = (deltaTime * e / 1000000.0) * st->kI; // 1000000 - while µS
+  iMV = st->iMV + ii;
 
   double dMV = 0;
   if (deltaTime != 0)
   {
-    long de = e - ps->e;
+    long de = e - st->e;
     if (de != 0)
-      dMV = ps->kD * (e - ps->e) / deltaTime * 1000000.0;
+      dMV = st->kD * (e - st->e) / deltaTime * 1000000.0;
   }
 
-  ps->pMV = pMV;
-  ps->iMV = iMV;
-  ps->dMV = dMV;
-  ps->e = e;
+  st->pMV = pMV;
+  st->iMV = iMV;
+  st->dMV = dMV;
+  st->e = e;
 
   double MV = pMV + iMV + dMV;
 
@@ -79,65 +76,63 @@ void update_MV(Config *cfg, State *st, pidState *ps)
 
   newMV.pwm = MV;
 
-  ps->MV = newMV;
+  st->MV = newMV;
 }
 
-long prevTime = 0;
-void apply_MV(Config *cfg, State *st, pidState *ps)
+void apply_MV(State *st)
 {
   int mv = 0;
 
-  if (ps->MV.pwm != 0)
+  if (st->MV.pwm != 0)
   {
-    if (ps->isFirstCycle)
+    if (st->isFirstCycle)
     {
       // first cycle of regulation
-      ps->isFirstCycle = false;
+      st->isFirstCycle = false;
     }
 
-    mv = ps->MV.pwm;
-    if (mv < cfg->getMinSpeed() || st->workspaceResearchMode != NO_PROCESS || st->zeroSearchMode != NO_PROCESS)
-      mv = cfg->getMinSpeed();
+    mv = st->MV.pwm;
+    if (mv < st->getMinSpeed() || st->workspaceResearchMode != NO_PROCESS || st->zeroSearchMode != NO_PROCESS)
+      mv = st->getMinSpeed();
 
 #ifndef TEST_PC_CPP
       //SHOW_MESSAGE((String) + "#pos " + st->currentPos + " mv " + mv + " MV.pwm  " + (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm) + " e " + ps->prevE);
 #else
     if (!no_prompt)
-      printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (ps->MV.direction ? -ps->MV.pwm : ps->MV.pwm), ps->e);
+      printf("#pos %ld mv %d MV.pwm %ld e %ld\n", st->currentPos, mv, (st->MV.direction ? -st->MV.pwm : st->MV.pwm), st->e);
 #endif
 
-    if (mv > cfg->getMaxSpeed())
-      mv = cfg->getMaxSpeed();
+    if (mv > st->getMaxSpeed())
+      mv = st->getMaxSpeed();
   }
   else
   {
-    if (!ps->isFirstCycle)
+    if (!st->isFirstCycle)
     {
-      SHOW_MESSAGE((String)ps->axis_name + " stopped! in " + (micros() - prevTime));
       prevTime = micros();
-      ps->isFirstCycle = true;
+      st->isFirstCycle = true;
     }
   }
 
-  if (ps->MV.direction == FORWARD)
+  if (st->MV.direction == FORWARD)
   {
     if (!st->isStoped)
     {
-      cfg->SetPWM(mv);
-      cfg->TurnFWD();
+      st->SetPWM(mv);
+      st->TurnFWD();
     }
     else
     {
-      if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
+      if (!st->IsEndPlus() && !st->IsEndMinus())
       {
         st->isStoped = 0;
       }
       else
       {
-        if (!cfg->IsEndPlus())
+        if (!st->IsEndPlus())
         {
-          cfg->SetPWM(mv);
-          cfg->TurnFWD();
+          st->SetPWM(mv);
+          st->TurnFWD();
         }
       }
     }
@@ -146,21 +141,21 @@ void apply_MV(Config *cfg, State *st, pidState *ps)
   {
     if (!st->isStoped)
     {
-      cfg->SetPWM(mv);
-      cfg->TurnBWD();
+      st->SetPWM(mv);
+      st->TurnBWD();
     }
     else
     {
-      if (!cfg->IsEndPlus() && !cfg->IsEndMinus())
+      if (!st->IsEndPlus() && !st->IsEndMinus())
       {
         st->isStoped = 0;
       }
       else
       {
-        if (!cfg->IsEndMinus())
+        if (!st->IsEndMinus())
         {
-          cfg->SetPWM(mv);
-          cfg->TurnBWD();
+          st->SetPWM(mv);
+          st->TurnBWD();
         }
       }
     }

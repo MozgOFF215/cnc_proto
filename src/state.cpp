@@ -1,11 +1,8 @@
 #include "state.h"
+#include "pins.h"
 
-State::State(const char name[8])
-{
-  for (int i = 0; i < 8; i++)
-    axis_name[i] = name[i];
-}
-
-// Create a global instance of the State singleton
-State X_state("Axis X"); // Axis X
-State Y_state("Axis Y");
+// Create a global instance of the State singletons
+State X_state("Axis X", X_enc1, X_enc2, X_turnFwd, X_turnBwd, X_enA, X_end1, X_end2,
+                165, 200); // Axis X
+State Y_state("Axis Y", Y_enc1, Y_enc2, Y_turnFwd, Y_turnBwd, Y_enB, Y_end1, Y_end2,
+                157, 170); // Axis Y

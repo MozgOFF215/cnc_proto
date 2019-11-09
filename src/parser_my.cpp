@@ -1,6 +1,5 @@
 #include "parser_my.h"
 #include "state.h"
-#include "config.h"
 #include "workspace_research.h"
 #include "seek_0.h"
 
@@ -62,31 +61,31 @@ void parse_my(const char *p)
       if (X_state.isZeroFound)
         X_state.destinationPos = 0l;
       else
-        startZeroSeek(&X_config, &X_state);
+        startZeroSeek(&X_state);
 
       if (Y_state.isZeroFound)
         Y_state.destinationPos = 0l;
       else
-        startZeroSeek(&Y_config, &Y_state);
+        startZeroSeek(&Y_state);
     }
 
     if (c.codenum == 280)
     {
       if (!X_state.isWorkspaceKnown)
-        startResearch(&X_config, &X_state);
+        startResearch(&X_state);
       else
         SHOW_MESSAGE((String) "Workspace X alredy known. max=" + X_state.maxPos);
 
       if (!Y_state.isWorkspaceKnown)
-        startResearch(&Y_config, &Y_state);
+        startResearch(&Y_state);
       else
         SHOW_MESSAGE((String) "Workspace Y alredy known. max=" + Y_state.maxPos);
     }
 
     if (c.codenum == 281)
     {
-      startResearch(&X_config, &X_state);
-      startResearch(&Y_config, &Y_state);
+      startResearch(&X_state);
+      startResearch(&Y_state);
     }
 #endif
 
@@ -94,21 +93,23 @@ void parse_my(const char *p)
     {
 #ifndef TEST_PC_CPP
       String mon = "endstops: X-=";
-      mon += (X_config.IsEndMinus() ? "1" : "0");
+      mon += (X_state.IsEndMinus() ? "1" : "0");
       mon += " X+=";
-      mon += (X_config.IsEndPlus() ? "1" : "0");
+      mon += (X_state.IsEndPlus() ? "1" : "0");
       SHOW_MESSAGE(mon);
       SHOW_MESSAGE((String) "position X: " + X_state.currentPos);
 
       mon = "endstops: Y-=";
-      mon += (Y_config.IsEndMinus() ? "1" : "0");
+      mon += (Y_state.IsEndMinus() ? "1" : "0");
       mon += " X+=";
-      mon += (Y_config.IsEndPlus() ? "1" : "0");
+      mon += (Y_state.IsEndPlus() ? "1" : "0");
       SHOW_MESSAGE(mon);
       SHOW_MESSAGE((String) "position Y: " + Y_state.currentPos);
 #else
-      printf("endstops: X-=%s X+=%s", X_config.IsEndMinus() ? "ON" : "OFF", X_config.IsEndPlus() ? "ON" : "OFF");
+      printf("endstops: X-=%s X+=%s", X_state.IsEndMinus() ? "ON" : "OFF", X_state.IsEndPlus() ? "ON" : "OFF");
       printf("position %ld", X_state.currentPos);
+      printf("endstops: Y-=%s Y+=%s", Y_state.IsEndMinus() ? "ON" : "OFF", Y_state.IsEndPlus() ? "ON" : "OFF");
+      printf("position %ld", Y_state.currentPos);
 #endif
     }
   }

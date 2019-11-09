@@ -1,9 +1,9 @@
 #include "macros.h"
 #include "seek_0.h"
 
-void startZeroSeek(Config *cfg, State *st)
+void startZeroSeek(State *st)
 {
-  if (cfg->IsEndMinus() /*|| END2 */)
+  if (st->IsEndMinus() /*|| END2 */)
   {
     SHOW_MESSAGE("not possible zero seek: need to leave the left endstop.");
     return;
@@ -13,7 +13,7 @@ void startZeroSeek(Config *cfg, State *st)
   st->destinationPos = -9999l;
 }
 
-void foundEndStop_0(Config *cfg, State *st)
+void foundEndStop_0(State *st)
 {
   if (st->zeroSearchMode == LEFT_ENDSTOP_SEARCH)
   {
@@ -23,12 +23,12 @@ void foundEndStop_0(Config *cfg, State *st)
   }
 }
 
-void leaveEndStop_0(Config *cfg, State *st)
+void leaveEndStop_0(State *st)
 {
   if (st->zeroSearchMode == SEEK_0)
   {
     SHOW_MESSAGE("3. 0 found");
-    st->currentPos = -cfg->stopendProtectDistance;
+    st->currentPos = -st->stopendProtectDistance;
     st->minPos = 0;
     st->isZeroFound = true;
 
