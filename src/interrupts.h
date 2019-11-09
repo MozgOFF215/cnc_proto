@@ -10,5 +10,7 @@
 void initInterrupts();
 void X_encoderInterrupt();
 void X_endStopInterrupt();
+void Y_encoderInterrupt();
+void Y_endStopInterrupt();
 
 #endif // _INTERRUPTS_H_

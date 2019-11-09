@@ -8,3 +8,4 @@ State::State(const char name[8])
 
 // Create a global instance of the State singleton
 State X_state("Axis X"); // Axis X
+State Y_state("Axis Y");

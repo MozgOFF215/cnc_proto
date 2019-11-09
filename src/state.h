@@ -28,5 +28,6 @@ public:
 };
 
 extern State X_state;
+extern State Y_state;
 
 #endif // _STATE_H_1

@@ -30,15 +30,19 @@ private:
       *d++ = *s++;
   }
 
+  int minSpeed;
+  int maxSpeed;
+
 public:
-  const int minSpeed = 129;
-  const int maxSpeed = 180;
   const int stopendProtectDistance = 50;
+
+  int getMinSpeed() { return minSpeed; }
+  int getMaxSpeed() { return maxSpeed; }
 
   char axis_name[8];
 #ifndef TEST_PC_CPP
   Config(const char name[8], uint8_t pin_enc1, uint8_t pin_enc2, uint8_t pin_turnFwd, uint8_t pin_turnBwd,
-         uint8_t pin_pwm, uint8_t pin_end1, uint8_t pin_end2)
+         uint8_t pin_pwm, uint8_t pin_end1, uint8_t pin_end2, int minSpeed, int maxSpeed)
   {
     copy(name, axis_name, 8);
 
@@ -49,6 +53,9 @@ public:
     Config::pin_pwm = pin_pwm;
     Config::pin_end1 = pin_end1;
     Config::pin_end2 = pin_end2;
+
+    Config::minSpeed = minSpeed;
+    Config::maxSpeed = maxSpeed;
   }
 #else
   Config(const char name[8], const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
@@ -109,4 +116,5 @@ public:
 };
 
 extern Config X_config;
+extern Config Y_config;
 #endif // _CONFIG_H_

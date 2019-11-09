@@ -40,11 +40,12 @@ public:
   pidMV MV;
 };
 
-void initController(pidState *ps);
+void initControllerX(pidState *ps);
 void controller(Config *cfg, State *st, pidState *ps);
 void update_MV(Config *cfg, State *st, pidState *ps);
 void apply_MV(Config *cfg, State *st, pidState *ps);
 
 extern pidState X_pidState;
+extern pidState Y_pidState;
 
 #endif // _CONTROLLER_H_

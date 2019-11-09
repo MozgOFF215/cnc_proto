@@ -17,13 +17,21 @@ bool stringComplete = false; // whether the string is complete
 void setup()
 {
   pinMode(p_led, OUTPUT);
+
   pinMode(X_turnFwd, OUTPUT);
   pinMode(X_turnBwd, OUTPUT);
   pinMode(X_enA, OUTPUT);
   pinMode(X_end1, INPUT_PULLUP);
   pinMode(X_end2, INPUT_PULLUP);
 
-  initController(&X_pidState);
+  pinMode(Y_turnFwd, OUTPUT);
+  pinMode(Y_turnBwd, OUTPUT);
+  pinMode(Y_enB, OUTPUT);
+  pinMode(Y_end1, INPUT_PULLUP);
+  pinMode(Y_end2, INPUT_PULLUP);
+
+  initControllerX(&X_pidState);
+  initControllerX(&Y_pidState);
 
   initInterrupts();
 
@@ -66,4 +74,5 @@ void loop()
   }
 
   controller(&X_config, &X_state, &X_pidState);
+  controller(&Y_config, &Y_state, &Y_pidState);
 }
