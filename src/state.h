@@ -74,7 +74,7 @@ public:
   }
 #else
   State(const char name[8], const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
-        const char pin_pwm[8], const char pin_end1[8], const char pin_end2[8])
+        const char pin_pwm[8], const char pin_end1[8], const char pin_end2[8], int minSpeed, int maxSpeed, double kAxis)
   {
     copy(name, axis_name, 8);
 
@@ -85,6 +85,14 @@ public:
     copy(pin_pwm, State::pin_pwm, 8);
     copy(pin_end1, State::pin_end1, 8);
     copy(pin_end2, State::pin_end2, 8);
+
+    State::minSpeed = minSpeed;
+    State::maxSpeed = maxSpeed;
+
+    State::kAxis = kAxis;
+
+    destinationPos = 0;
+    endMovingFunction = NULL;
   }
 #endif
 
