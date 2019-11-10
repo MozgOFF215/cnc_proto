@@ -48,23 +48,26 @@ void parse_my(const char *p)
   parserCode c = getCode(p);
 
   if (c.letter == 'X')
-    X_state.destinationPos = c.codenum;
+  {
+    X_state.goTo(c.codenum);
+  }
 
   if (c.letter == 'Y')
-    Y_state.destinationPos = c.codenum;
-
+  {
+    Y_state.goTo(c.codenum);
+  }
   if (c.letter == 'G')
   {
 #ifndef TEST_PC_CPP
     if (c.codenum == 28)
     {
       if (X_state.isZeroFound)
-        X_state.destinationPos = 0l;
+        X_state.goTo_Strokes(0L);
       else
         startZeroSeek(&X_state);
 
       if (Y_state.isZeroFound)
-        Y_state.destinationPos = 0l;
+        Y_state.goTo_Strokes(0L);
       else
         startZeroSeek(&Y_state);
     }

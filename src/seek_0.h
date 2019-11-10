@@ -6,5 +6,6 @@
 void startZeroSeek(State *st);
 void foundEndStop_0(State *st);
 void leaveEndStop_0(State *st);
+void nullIsOk(State *st);
 
 #endif // _SEEK_0_H_

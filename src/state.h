@@ -38,6 +38,10 @@ private:
 
   int minSpeed;
   int maxSpeed;
+  double kAxis;
+  long fromPos; // backup current pos before new motion
+  long destinationPos;
+  void (*endMovingFunction)(State *);
 
 public:
   const int stopendProtectDistance = 50;
@@ -48,7 +52,7 @@ public:
   char axis_name[8];
 #ifndef TEST_PC_CPP
   State(const char name[8], uint8_t pin_enc1, uint8_t pin_enc2, uint8_t pin_turnFwd, uint8_t pin_turnBwd,
-        uint8_t pin_pwm, uint8_t pin_end1, uint8_t pin_end2, int minSpeed, int maxSpeed)
+        uint8_t pin_pwm, uint8_t pin_end1, uint8_t pin_end2, int minSpeed, int maxSpeed, double kAxis)
   {
     copy(name, axis_name, 8);
 
@@ -62,6 +66,11 @@ public:
 
     State::minSpeed = minSpeed;
     State::maxSpeed = maxSpeed;
+
+    State::kAxis = kAxis;
+
+    destinationPos = 0;
+    endMovingFunction = NULL;
   }
 #else
   State(const char name[8], const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
@@ -80,7 +89,6 @@ public:
 #endif
 
   long currentPos = 0;
-  long destinationPos = 0;
   bool isStoped = true; // starting value = true
 
   long minPos = -9999;
@@ -94,9 +102,7 @@ public:
   search_steps workspaceResearchMode = NO_PROCESS;
   search_steps zeroSearchMode = NO_PROCESS;
 
-  void (*endMovingFunction)();
-
-// PID
+  // PID
   long position;
   long e;
   double pMV;
@@ -154,6 +160,57 @@ public:
   bool IsEndPlus()
   {
     return digitalRead(pin_end2);
+  }
+
+  long FromSI(double mm)
+  {
+    return mm * kAxis;
+  }
+
+  double ToSI(long pos)
+  {
+    return pos / kAxis;
+  }
+
+  long getDestination() { return destinationPos; }
+
+  void goTo(double posMM)
+  {
+    long newPos = FromSI(posMM);
+    destinationPos = newPos;
+    fromPos = currentPos;
+  }
+
+  void goTo(double posMM, void (*endMovingFunction)(State *st))
+  {
+    State::endMovingFunction = endMovingFunction;
+    goTo(posMM);
+  }
+
+  void goTo_Strokes(long pos)
+  {
+    destinationPos = pos;
+    fromPos = currentPos;
+  }
+
+  void goTo_Strokes(long pos, void (*endMovingFunction)(State *))
+  {
+    State::endMovingFunction = endMovingFunction;
+    goTo_Strokes(pos);
+  }
+
+  bool checkSuccessfulMove()
+  {
+    bool result = fromPos < destinationPos ? currentPos >= destinationPos : currentPos <= destinationPos;
+    if (result)
+    {
+      if (endMovingFunction != NULL)
+      {
+        (*endMovingFunction)(this);
+        endMovingFunction = NULL;
+      }
+    }
+    return result;
   }
 };
 

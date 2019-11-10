@@ -9,7 +9,7 @@ void startResearch(State *st)
   }
   SHOW_MESSAGE("1. Start workspace research. Search left endstop.");
   st->workspaceResearchMode = LEFT_ENDSTOP_SEARCH;
-  st->destinationPos = -9999;
+  st->goTo_Strokes(-9999L);
 }
 
 void foundEndStop(State *st)
@@ -18,7 +18,7 @@ void foundEndStop(State *st)
   {
     SHOW_MESSAGE("2. Seek 0");
     st->workspaceResearchMode = SEEK_0;
-    st->destinationPos = 100;
+    st->goTo_Strokes(100L);
   }
 
   if (st->workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
@@ -30,7 +30,7 @@ void foundEndStop(State *st)
 #endif
     SHOW_MESSAGE("4. seek max");
     st->workspaceResearchMode = SEEK_MAX;
-    st->destinationPos = st->currentPos - 100;
+    st->goTo_Strokes(st->currentPos - 100);
   }
 }
 
@@ -45,7 +45,7 @@ void leaveEndStop(State *st)
 
     SHOW_MESSAGE("3. Search right endstop.");
     st->workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;
-    st->destinationPos = 9999;
+    st->goTo_Strokes(9999L);
   }
 
   if (st->workspaceResearchMode == SEEK_MAX)
@@ -62,6 +62,6 @@ void leaveEndStop(State *st)
     st->isWorkspaceKnown = true;
 
     SHOW_MESSAGE("5. go to 0");
-    st->destinationPos = 0;
+    st->goTo_Strokes(0L);
   }
 }

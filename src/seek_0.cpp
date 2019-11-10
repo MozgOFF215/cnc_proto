@@ -10,7 +10,7 @@ void startZeroSeek(State *st)
   }
   SHOW_MESSAGE("1. Start zero seek. Search left endstop.");
   st->zeroSearchMode = LEFT_ENDSTOP_SEARCH;
-  st->destinationPos = -9999l;
+  st->goTo_Strokes(-9999L);
 }
 
 void foundEndStop_0(State *st)
@@ -19,7 +19,7 @@ void foundEndStop_0(State *st)
   {
     SHOW_MESSAGE("2. Seek 0");
     st->zeroSearchMode = SEEK_0;
-    st->destinationPos = 100;
+    st->goTo_Strokes(100L);
   }
 }
 
@@ -35,6 +35,11 @@ void leaveEndStop_0(State *st)
     st->zeroSearchMode = NO_PROCESS;
 
     SHOW_MESSAGE("4. go to 0");
-    st->destinationPos = 0;
+    st->goTo_Strokes(0L, &nullIsOk);
   }
+}
+
+void nullIsOk(State *st)
+{
+  SHOW_MESSAGE("5. I am on the 0!");
 }

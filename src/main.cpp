@@ -37,8 +37,6 @@ void setup()
 
   Serial.begin(38400);
 
-  X_state.endMovingFunction = nullptr;
-
   if (!X_state.IsEndMinus() && !X_state.IsEndPlus())
   {
     X_state.isStoped = false;
