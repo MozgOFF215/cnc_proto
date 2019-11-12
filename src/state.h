@@ -49,12 +49,12 @@ public:
   int getMinSpeed() { return minSpeed; }
   int getMaxSpeed() { return maxSpeed; }
 
-  char axis_name[8];
+  char axis_name;
 #ifndef TEST_PC_CPP
-  State(const char name[8], uint8_t pin_enc1, uint8_t pin_enc2, uint8_t pin_turnFwd, uint8_t pin_turnBwd,
+  State(char name, uint8_t pin_enc1, uint8_t pin_enc2, uint8_t pin_turnFwd, uint8_t pin_turnBwd,
         uint8_t pin_pwm, uint8_t pin_end1, uint8_t pin_end2, int minSpeed, int maxSpeed, double kAxis)
   {
-    copy(name, axis_name, 8);
+    axis_name = name;
 
     State::pin_enc1 = pin_enc1;
     State::pin_enc2 = pin_enc2;
@@ -73,10 +73,10 @@ public:
     endMovingFunction = NULL;
   }
 #else
-  State(const char name[8], const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
+  State(char name, const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
         const char pin_pwm[8], const char pin_end1[8], const char pin_end2[8], int minSpeed, int maxSpeed, double kAxis)
   {
-    copy(name, axis_name, 8);
+    axis_name = name;
 
     copy(pin_enc1, State::pin_enc1, 8);
     copy(pin_enc2, State::pin_enc2, 8);

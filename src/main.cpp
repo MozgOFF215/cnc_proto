@@ -51,7 +51,7 @@ void loop()
   if (Serial.available())
   {
     char inChar = (char)Serial.read();
-    Serial.print(inChar);
+    //Serial.print(inChar);
     if (inChar == '\n')
       stringComplete = true;
     else
@@ -61,7 +61,7 @@ void loop()
   if (stringComplete)
   {
 #ifndef TEST_PC_CPP
-    SHOW_MESSAGE("command: " + inputString);
+    //SHOW_MESSAGE(inputString);
 #else
     printf("command: %s", inputString);
 #endif
