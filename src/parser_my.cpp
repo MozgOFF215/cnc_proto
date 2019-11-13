@@ -3,151 +3,159 @@
 #include "workspace_research.h"
 #include "seek_0.h"
 
-parserCode getCode(const char *p)
-{
-  parserCode result;
-  result.letter = '?';
-  result.codenum = 0;
-  result.pNextSymbol = nullptr;
+Parser parser;
 
-  if (*p == 0)
-    return result;
-
-  // Skip spaces
-  while (*p == ' ')
-    ++p;
-
-  if (*p == 0)
-    return result;
-
-  const char letter = *p >= 'a' && *p <= 'z' ? *p & 0xDF : *p; // to upper case
-  p++;
-
-  int codenum = 0;
-  if (NUMERIC(*p))
-    do
-    {
-      codenum *= 10;
-      codenum += *p++ - '0';
-    } while (NUMERIC(*p));
-
-  result.letter = letter;
-  result.codenum = codenum;
-
-  if (*p != 0)
-    result.pNextSymbol = p;
-
-  if (*p == 0)
-    return result;
-
-  return result;
-}
-
-bool waitX, waitY;
+void (*send_temp)(const char *);
 
 void moveIsSuccess(State *st)
 {
-  if (st->axis_name == 'X')
-    waitX = false;
-  if (st->axis_name == 'Y')
-    waitY = false;
+  if (!X_state.isWait() && !Y_state.isWait())
+  {
+    (*send_temp)("ok\n");
+  }
 }
 
-void parse_my(const char *p)
+void parse_my(const char *p, void (*send)(const char *))
 {
-  waitX = false;
-  waitY = false;
-  parserCode c;
-  do
+  send_temp = send;
+
+  parser.parse(p);
+
+  if (parser.hasCommand('M'))
   {
-    c = getCode(p);
-    //Serial.printf("command [%s] letter [%c] code [%d]\n", p, c.letter, c.codenum);
-    p = c.pNextSymbol;
-
-    if (c.letter == 'M')
+    int c = parser.getCommand('M');
+    switch (c)
     {
-#ifndef TEST_PC_CPP
-      Serial.printf("ok\n");
-      Serial.printf("45\n");
-      if (c.codenum == 150)
-      {
-        Serial.printf("40\n");
-      }
+    case 105:
+      send("ok B:25 T:35\n");
+      break;
+
+    case 104: // temp. extruder Sxxx, not wait
+    case 110: // next line
+    case 109: // temp. extruder Sxxx, and wait
+    case 82:  // set axis of extruder in absolut
+    case 107: // fan is off
+      send("ok\n");
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  if (parser.hasCommand('G'))
+  {
+    int c = parser.getCommand('G');
+    switch (c)
+    {
+    case 0: //G0
+    case 1: //G1
+    {
+      if (parser.hasCommand('X'))
+        X_state.goTo(parser.getCommand('X'), &moveIsSuccess);
+      if (parser.hasCommand('Y'))
+        Y_state.goTo(parser.getCommand('Y'), &moveIsSuccess);
+#ifdef TEST_PC_CPP
+      send("ok\n");
+#endif
+    }
+    break;
+
+    case 90: // reset absolut origin
+    {
+#ifdef TEST_PC_CPP
+      send("ok\n");
 #endif
     }
 
-    if (c.letter == 'X')
+    break;
+    case 92: // set absolut origin
     {
-      waitX = true;
-      X_state.goTo(c.codenum, &moveIsSuccess);
-    }
-
-    if (c.letter == 'Y')
-    {
-      waitY = true;
-      Y_state.goTo(c.codenum, &moveIsSuccess);
-    }
-
-    if (c.letter == 'G')
-    {
-#ifndef TEST_PC_CPP
-      if (c.codenum == 28)
-      {
-        if (X_state.isZeroFound)
-          X_state.goTo_Strokes(0L);
-        else
-          startZeroSeek(&X_state);
-
-        if (Y_state.isZeroFound)
-          Y_state.goTo_Strokes(0L);
-        else
-          startZeroSeek(&Y_state);
-      }
-
-      if (c.codenum == 280)
-      {
-        if (!X_state.isWorkspaceKnown)
-          startResearch(&X_state);
-        else
-          SHOW_MESSAGE((String) "Workspace X alredy known. max=" + X_state.maxPos);
-
-        if (!Y_state.isWorkspaceKnown)
-          startResearch(&Y_state);
-        else
-          SHOW_MESSAGE((String) "Workspace Y alredy known. max=" + Y_state.maxPos);
-      }
-
-      if (c.codenum == 281)
-      {
-        startResearch(&X_state);
-        startResearch(&Y_state);
-      }
+#ifdef TEST_PC_CPP
+      send("ok\n");
 #endif
+    }
+    break;
 
-      if (c.codenum == 555)
-      {
+    case 28:
+    {
 #ifndef TEST_PC_CPP
-        String mon = "endstops: X-=";
-        mon += (X_state.IsEndMinus() ? "1" : "0");
-        mon += " X+=";
-        mon += (X_state.IsEndPlus() ? "1" : "0");
-        SHOW_MESSAGE(mon);
-        SHOW_MESSAGE((String) "position X: " + X_state.currentPos);
+      if (X_state.isZeroFound)
+      {
+        X_state.goTo_Strokes(0L, &moveIsSuccess);
+      }
+      else
+        startZeroSeek(&X_state, &moveIsSuccess);
 
-        mon = "endstops: Y-=";
-        mon += (Y_state.IsEndMinus() ? "1" : "0");
-        mon += " X+=";
-        mon += (Y_state.IsEndPlus() ? "1" : "0");
-        SHOW_MESSAGE(mon);
-        SHOW_MESSAGE((String) "position Y: " + Y_state.currentPos);
+      if (Y_state.isZeroFound)
+      {
+        Y_state.goTo_Strokes(0L, &moveIsSuccess);
+      }
+      else
+
+        startZeroSeek(&Y_state, &moveIsSuccess);
 #else
-        printf("endstops: X-=%s X+=%s", X_state.IsEndMinus() ? "ON" : "OFF", X_state.IsEndPlus() ? "ON" : "OFF");
-        printf("position %ld", X_state.currentPos);
-        printf("endstops: Y-=%s Y+=%s", Y_state.IsEndMinus() ? "ON" : "OFF", Y_state.IsEndPlus() ? "ON" : "OFF");
-        printf("position %ld", Y_state.currentPos);
+      send("ok\n");
 #endif
-      }
     }
-  } while (c.pNextSymbol != nullptr);
-  //Serial.printf("GO\n");
+    break;
+
+    case 280:
+    {
+#ifndef TEST_PC_CPP
+      if (!X_state.isWorkspaceKnown)
+        startResearch(&X_state, &moveIsSuccess);
+      else
+        SHOW_MESSAGE((String) "Workspace X alredy known. max=" + X_state.maxPos);
+
+      if (!Y_state.isWorkspaceKnown)
+        startResearch(&Y_state, &moveIsSuccess);
+      else
+        SHOW_MESSAGE((String) "Workspace Y alredy known. max=" + Y_state.maxPos);
+#else
+      send("ok\n");
+#endif
+    }
+    break;
+
+    case 281:
+    {
+#ifndef TEST_PC_CPP
+      startResearch(&X_state, &moveIsSuccess);
+      startResearch(&Y_state, & moveIsSuccess);
+#else
+      send("ok\n");
+#endif
+    }
+    break;
+
+    case 555:
+    {
+#ifndef TEST_PC_CPP
+      String mon = "endstops: X-=";
+      mon += (X_state.IsEndMinus() ? "1" : "0");
+      mon += " X+=";
+      mon += (X_state.IsEndPlus() ? "1" : "0");
+      SHOW_MESSAGE(mon);
+      SHOW_MESSAGE((String) "position X: " + X_state.currentPos);
+
+      mon = "endstops: Y-=";
+      mon += (Y_state.IsEndMinus() ? "1" : "0");
+      mon += " X+=";
+      mon += (Y_state.IsEndPlus() ? "1" : "0");
+      SHOW_MESSAGE(mon);
+      SHOW_MESSAGE((String) "position Y: " + Y_state.currentPos);
+#else
+      printf("endstops: X-=%s X+=%s", X_state.IsEndMinus() ? "ON" : "OFF", X_state.IsEndPlus() ? "ON" : "OFF");
+      printf("position %ld", X_state.currentPos);
+      printf("endstops: Y-=%s Y+=%s", Y_state.IsEndMinus() ? "ON" : "OFF", Y_state.IsEndPlus() ? "ON" : "OFF");
+      printf("position %ld", Y_state.currentPos);
+      send("ok\n");
+#endif
+      break;
+    }
+    default:
+      break;
+    }
+  }
 }

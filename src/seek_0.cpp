@@ -1,8 +1,10 @@
 #include "macros.h"
 #include "seek_0.h"
 
-void startZeroSeek(State *st)
+void startZeroSeek(State *st, callback endMovingFunction)
 {
+  st->pushTempCallback(endMovingFunction);
+
   if (st->IsEndMinus() /*|| END2 */)
   {
     SHOW_MESSAGE("not possible zero seek: need to leave the left endstop.");
@@ -35,11 +37,12 @@ void leaveEndStop_0(State *st)
     st->zeroSearchMode = NO_PROCESS;
 
     SHOW_MESSAGE("4. go to 0");
-    st->goTo_Strokes(0L, &nullIsOk);
+    st->goTo_Strokes(0L, &nullIsOk_0);
   }
 }
 
-void nullIsOk(State *st)
+void nullIsOk_0(State *st)
 {
   SHOW_MESSAGE("5. I am on the 0!");
+  (*st->popTempCallback())(st);
 }

@@ -46,6 +46,11 @@ void setup()
   inputString.reserve(200);
 }
 
+void send(const char * str)
+{
+  Serial.printf("%s", str);
+}
+
 void loop()
 {
   if (Serial.available())
@@ -67,7 +72,7 @@ void loop()
 #endif
 
     stringComplete = false;
-    parse_my(inputString.c_str());
+    parse_my(inputString.c_str(), &send);
     inputString = "";
   }
 

@@ -1,7 +1,9 @@
 #include "workspace_research.h"
 
-void startResearch(State *st)
+void startResearch(State *st, callback endMovingFunction)
 {
+  st->pushTempCallback(endMovingFunction);
+
   if (st->IsEndMinus() || st->IsEndPlus())
   {
     SHOW_MESSAGE("not possible to research: need to leave the endstops");
@@ -62,6 +64,12 @@ void leaveEndStop(State *st)
     st->isWorkspaceKnown = true;
 
     SHOW_MESSAGE("5. go to 0");
-    st->goTo_Strokes(0L);
+    st->goTo_Strokes(0L, &nullIsOk);
   }
+}
+
+void nullIsOk(State *st)
+{
+  SHOW_MESSAGE("6. I am on the 0!");
+  (*st->popTempCallback())(st);
 }

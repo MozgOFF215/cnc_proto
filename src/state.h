@@ -21,6 +21,10 @@ struct pidMV
   moveDirection direction;
 };
 
+class State;
+
+typedef void (*callback)(State *);
+
 class State
 {
 private:
@@ -41,7 +45,10 @@ private:
   double kAxis;
   long fromPos; // backup current pos before new motion
   long destinationPos;
-  void (*endMovingFunction)(State *);
+
+  bool wait;
+  callback endMovingFunction;
+  callback temp_callback;
 
 public:
   const int stopendProtectDistance = 50;
@@ -189,9 +196,10 @@ public:
     fromPos = currentPos;
   }
 
-  void goTo(double posMM, void (*endMovingFunction)(State *st))
+  void goTo(double posMM, callback endMovingFunction)
   {
     State::endMovingFunction = endMovingFunction;
+    wait = true;
     goTo(posMM);
   }
 
@@ -201,17 +209,21 @@ public:
     fromPos = currentPos;
   }
 
-  void goTo_Strokes(long pos, void (*endMovingFunction)(State *))
+  void goTo_Strokes(long pos, callback endMovingFunction)
   {
     State::endMovingFunction = endMovingFunction;
+    wait = true;
     goTo_Strokes(pos);
   }
+
+  bool isWait() { return wait; }
 
   bool checkSuccessfulMove()
   {
     bool result = fromPos < destinationPos ? currentPos >= destinationPos : currentPos <= destinationPos;
     if (result)
     {
+      wait = false;
       if (endMovingFunction != NULL)
       {
         (*endMovingFunction)(this);
@@ -219,6 +231,16 @@ public:
       }
     }
     return result;
+  }
+
+  void pushTempCallback(callback temp_callback)
+  {
+    State::temp_callback = temp_callback;
+  }
+
+  callback popTempCallback()
+  {
+    return temp_callback;
   }
 };
 

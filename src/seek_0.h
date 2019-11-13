@@ -3,9 +3,9 @@
 
 #include "state.h"
 
-void startZeroSeek(State *st);
+void startZeroSeek(State *st, callback endMovingFunction);
 void foundEndStop_0(State *st);
 void leaveEndStop_0(State *st);
-void nullIsOk(State *st);
+void nullIsOk_0(State *st);
 
 #endif // _SEEK_0_H_
