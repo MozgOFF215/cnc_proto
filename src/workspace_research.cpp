@@ -10,20 +10,20 @@ void startResearch(State *st, callback endMovingFunction)
     return;
   }
   SHOW_MESSAGE("1. Start workspace research. Search left endstop.");
-  st->workspaceResearchMode = LEFT_ENDSTOP_SEARCH;
+  st->workspaceResearchMode = MINUS_ENDSTOP_SEARCH;
   st->goTo_Strokes(-9999L);
 }
 
 void foundEndStop(State *st)
 {
-  if (st->workspaceResearchMode == LEFT_ENDSTOP_SEARCH)
+  if (st->workspaceResearchMode == MINUS_ENDSTOP_SEARCH)
   {
     SHOW_MESSAGE("2. Seek 0");
     st->workspaceResearchMode = SEEK_0;
     st->goTo_Strokes(100L);
   }
 
-  if (st->workspaceResearchMode == RIGHT_ENDSTOP_SEARCH)
+  if (st->workspaceResearchMode == PLUS_ENDSTOP_SEARCH)
   {
 #ifndef TEST_PC_CPP
     SHOW_MESSAGE((String) "4. right endstop found: " + st->currentPos);
@@ -46,7 +46,7 @@ void leaveEndStop(State *st)
     st->isZeroFound = true;
 
     SHOW_MESSAGE("3. Search right endstop.");
-    st->workspaceResearchMode = RIGHT_ENDSTOP_SEARCH;
+    st->workspaceResearchMode = PLUS_ENDSTOP_SEARCH;
     st->goTo_Strokes(9999L);
   }
 

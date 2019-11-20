@@ -9,6 +9,7 @@ void (*send_temp)(const char *);
 
 void moveIsSuccess(State *st)
 {
+  SHOW_MESSAGE((String) "echo: move " + st->axis_name + " is success\n");
   if (!X_state.isWait() && !Y_state.isWait())
   {
     (*send_temp)("ok\n");
@@ -34,6 +35,7 @@ void parse_my(const char *p, void (*send)(const char *))
     case 110: // next line
     case 109: // temp. extruder Sxxx, and wait
     case 82:  // set axis of extruder in absolut
+    case 106: // fan is on
     case 107: // fan is off
       send("ok\n");
       break;
@@ -50,11 +52,30 @@ void parse_my(const char *p, void (*send)(const char *))
     {
     case 0: //G0
     case 1: //G1
+    case 2: //G2 - arc
     {
+      bool known = false;
       if (parser.hasCommand('X'))
+      {
+        known = true;
         X_state.goTo(parser.getCommand('X'), &moveIsSuccess);
+      }
+
       if (parser.hasCommand('Y'))
+      {
+        known = true;
         Y_state.goTo(parser.getCommand('Y'), &moveIsSuccess);
+      }
+
+      if (parser.hasCommand('Z'))
+      {
+        known = true;
+        Z_state.goTo(parser.getCommand('Z'), &moveIsSuccess);
+      }
+
+      if (!known)
+        send("ok\n");
+
 #ifdef TEST_PC_CPP
       send("ok\n");
 #endif
@@ -71,29 +92,56 @@ void parse_my(const char *p, void (*send)(const char *))
     break;
     case 92: // set absolut origin
     {
-#ifdef TEST_PC_CPP
       send("ok\n");
-#endif
     }
     break;
 
     case 28:
     {
 #ifndef TEST_PC_CPP
-      if (X_state.isZeroFound)
+      bool x = false, y = false, z = false;
+      if (parser.hasCommand('X') || parser.hasCommand('Y') || parser.hasCommand('Z'))
       {
-        X_state.goTo_Strokes(0L, &moveIsSuccess);
+        if (parser.hasCommand('X'))
+          x = true;
+        if (parser.hasCommand('Y'))
+          y = true;
+        if (parser.hasCommand('Z'))
+          z = true;
       }
       else
-        startZeroSeek(&X_state, &moveIsSuccess);
-
-      if (Y_state.isZeroFound)
       {
-        Y_state.goTo_Strokes(0L, &moveIsSuccess);
+        x = true;
+        y = true;
+        z = true;
       }
-      else
 
-        startZeroSeek(&Y_state, &moveIsSuccess);
+      if (x)
+      {
+        if (X_state.isZeroFound)
+        {
+          X_state.goTo_Strokes(0L, &moveIsSuccess);
+        }
+        else
+          startZeroSeek(&X_state, &moveIsSuccess);
+      }
+
+      if (y)
+      {
+        if (Y_state.isZeroFound)
+        {
+          Y_state.goTo_Strokes(0L, &moveIsSuccess);
+        }
+        else
+          startZeroSeek(&Y_state, &moveIsSuccess);
+      }
+
+      if (z)
+      {
+        //if (!Z_state.isZeroFound)
+        startZeroSeek(&Z_state, &moveIsSuccess);
+      }
+
 #else
       send("ok\n");
 #endif
@@ -122,7 +170,7 @@ void parse_my(const char *p, void (*send)(const char *))
     {
 #ifndef TEST_PC_CPP
       startResearch(&X_state, &moveIsSuccess);
-      startResearch(&Y_state, & moveIsSuccess);
+      startResearch(&Y_state, &moveIsSuccess);
 #else
       send("ok\n");
 #endif

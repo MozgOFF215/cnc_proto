@@ -5,19 +5,32 @@ void startZeroSeek(State *st, callback endMovingFunction)
 {
   st->pushTempCallback(endMovingFunction);
 
-  if (st->IsEndMinus() /*|| END2 */)
+  if (st->isStepper())
   {
-    SHOW_MESSAGE("not possible zero seek: need to leave the left endstop.");
+    SHOW_MESSAGE("start seek Z '+' endstop.");
+    if (st->IsEndPlus())
+    {
+      SHOW_MESSAGE("not possible zero seek: need to leave the '+' endstop.");
+      return;
+    }
+    st->goTo_Strokes(9999L);
+    st->zeroSearchMode = PLUS_ENDSTOP_SEARCH;
     return;
   }
-  SHOW_MESSAGE("1. Start zero seek. Search left endstop.");
-  st->zeroSearchMode = LEFT_ENDSTOP_SEARCH;
+
+  if (st->IsEndMinus() /*|| END2 */)
+  {
+    SHOW_MESSAGE("not possible zero seek: need to leave the '-' endstop.");
+    return;
+  }
+  SHOW_MESSAGE("1. Start zero seek. Search '-' endstop.");
+  st->zeroSearchMode = MINUS_ENDSTOP_SEARCH;
   st->goTo_Strokes(-9999L);
 }
 
 void foundEndStop_0(State *st)
 {
-  if (st->zeroSearchMode == LEFT_ENDSTOP_SEARCH)
+  if (st->zeroSearchMode == MINUS_ENDSTOP_SEARCH)
   {
     SHOW_MESSAGE("2. Seek 0");
     st->zeroSearchMode = SEEK_0;

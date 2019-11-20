@@ -30,6 +30,7 @@ class State
 private:
 #ifndef TEST_PC_CPP
   uint8_t pin_enc1, pin_enc2, pin_turnFwd, pin_turnBwd, pin_pwm, pin_end1, pin_end2;
+  uint8_t pin_dir, pin_step;
 #else
   char pin_enc1[8], pin_enc2[8], pin_turnFwd[8], pin_turnBwd[8], pin_pwm[8], pin_end1[8], pin_end2[8];
 #endif
@@ -43,12 +44,38 @@ private:
   int minSpeed;
   int maxSpeed;
   double kAxis;
-  long fromPos; // backup current pos before new motion
-  long destinationPos;
+  long fromPos = 0; // backup current pos before new motion
+  long destinationPos = 0;
 
-  bool wait;
-  callback endMovingFunction;
-  callback temp_callback;
+  bool wait = false;
+  callback endMovingFunction = NULL;
+  callback temp_callback = NULL;
+
+  bool _isStepper = false;
+  uint32_t periodStepper = 2000; // µs
+  uint32_t timeToNext = 0;
+  bool limitIsKnown = false;
+  uint8_t lastStep = 0;
+  uint8_t lastDir = 0;
+
+  void waitNextStep()
+  {
+    timeToNext = micros() + periodStepper;
+  }
+
+  bool timeForNextStep()
+  {
+    uint32_t currentTime = micros();
+    if (timeToNext <= periodStepper)
+    {
+      //with overflow
+      return timeToNext <= currentTime && currentTime <= periodStepper;
+    }
+    else
+    {
+      return timeToNext <= currentTime || currentTime <= periodStepper;
+    }
+  }
 
 public:
   const int stopendProtectDistance = 50;
@@ -76,8 +103,28 @@ public:
 
     State::kAxis = kAxis;
 
+    currentPos = 0;
     destinationPos = 0;
     endMovingFunction = NULL;
+  }
+
+  State(char name, uint8_t pin_dir, uint8_t pin_step, uint8_t pin_end2, double kAxis)
+  {
+    // stepper motor axis
+
+    axis_name = name;
+    State::pin_end2 = pin_end2;
+    State::pin_dir = pin_dir;
+    State::pin_step = pin_step;
+
+    State::kAxis = kAxis;
+
+    currentPos = 0;
+    destinationPos = 0;
+    endMovingFunction = NULL;
+    _isStepper = true;
+
+    timeToNext = micros() + periodStepper + periodStepper;
   }
 #else
   State(char name, const char pin_enc1[8], const char pin_enc2[8], const char pin_turnFwd[8], const char pin_turnBwd[8],
@@ -136,6 +183,75 @@ public:
   pidMV MV;
   // END PID
 
+  bool isStepper() { return _isStepper; }
+
+  void NextStep()
+  {
+    if (timeForNextStep())
+    {
+      waitNextStep();
+
+      if (destinationPos > currentPos)
+      {
+        // step to plus
+        if (lastDir != 1)
+        {
+          digitalWrite(pin_dir, 1);
+          lastDir = 1;
+          return; // need time for new direction init
+        }
+
+        if (IsEndPlus())
+        {
+          if (zeroSearchMode == PLUS_ENDSTOP_SEARCH)
+          {
+            // plus limit is found
+            zeroSearchMode = PLUS_ENDSTOP_LEAVE;
+            destinationPos = currentPos - 100;
+            return;
+          }
+
+          if (!isStoped)
+          {
+            SHOW_MESSAGE("echo: plus endstop is active!!!");
+            isStoped = true;
+          }
+          return;
+        }
+
+        currentPos++;
+        lastStep = (lastStep + 1) & 1;
+        digitalWrite(pin_step, lastStep);
+      }
+
+      if (destinationPos < currentPos)
+      {
+        // step to minus
+        if (lastDir != 0)
+        {
+          digitalWrite(pin_dir, 0);
+          lastDir = 0;
+          return; // need time for new direction init
+        }
+
+        if (zeroSearchMode == PLUS_ENDSTOP_LEAVE && !IsEndPlus())
+        {
+          // leave plus endstop
+          zeroSearchMode = NO_PROCESS;
+          long posMax = FromSI(25);
+          currentPos = posMax + 50;
+          goTo_Strokes(posMax, popTempCallback());
+        }
+
+        currentPos--;
+        lastStep = (lastStep + 1) & 1;
+        digitalWrite(pin_step, lastStep);
+      }
+
+      checkSuccessfulMove();
+    }
+  }
+
   void TurnFWD()
   {
     digitalWrite(pin_turnFwd, HIGH);
@@ -169,11 +285,17 @@ public:
 
   bool IsEndMinus()
   {
+    if (isStepper())
+      return false;
+
     return digitalRead(pin_end1);
   }
 
   bool IsEndPlus()
   {
+    if (isStepper())
+      return !digitalRead(pin_end2);
+
     return digitalRead(pin_end2);
   }
 
@@ -205,6 +327,7 @@ public:
 
   void goTo_Strokes(long pos)
   {
+    SHOW_MESSAGE((String) "to pos:" + pos + " current:" + currentPos);
     destinationPos = pos;
     fromPos = currentPos;
   }
@@ -218,10 +341,42 @@ public:
 
   bool isWait() { return wait; }
 
+  unsigned long lastCheck;
+  unsigned long waitSomeTime = 50; // ms
+
   bool checkSuccessfulMove()
   {
-    bool result = fromPos < destinationPos ? currentPos >= destinationPos : currentPos <= destinationPos;
-    if (result)
+    bool isSuccess;
+
+    if (isStepper())
+    {
+      isSuccess = destinationPos == currentPos;
+    }
+    else
+    {
+      if (MV.pwm != 0)
+        lastCheck = millis();
+
+      bool noMoveSomeTime = millis() - lastCheck > waitSomeTime && MV.pwm == 0;
+
+      isSuccess = fromPos < destinationPos ? currentPos >= destinationPos : currentPos <= destinationPos;
+      if (fromPos < destinationPos)
+      {
+        if (currentPos >= destinationPos || noMoveSomeTime)
+        {
+          isSuccess = true;
+        }
+      }
+      else
+      {
+        if (currentPos <= destinationPos || noMoveSomeTime)
+        {
+          isSuccess = true;
+        }
+      }
+    }
+
+    if (isSuccess)
     {
       wait = false;
       if (endMovingFunction != NULL)
@@ -230,7 +385,7 @@ public:
         endMovingFunction = NULL;
       }
     }
-    return result;
+    return isSuccess;
   }
 
   void pushTempCallback(callback temp_callback)
@@ -246,5 +401,6 @@ public:
 
 extern State X_state;
 extern State Y_state;
+extern State Z_state;
 
 #endif // _STATE_H_1

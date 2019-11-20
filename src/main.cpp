@@ -30,8 +30,13 @@ void setup()
   pinMode(Y_end1, INPUT_PULLUP);
   pinMode(Y_end2, INPUT_PULLUP);
 
+  pinMode(Z_dir, OUTPUT);
+  pinMode(Z_step, OUTPUT);
+  pinMode(Z_limitMax, INPUT_PULLUP);
+
   initControllerX();
   initControllerY();
+  initControllerZ();
 
   initInterrupts();
 
@@ -46,7 +51,7 @@ void setup()
   inputString.reserve(200);
 }
 
-void send(const char * str)
+void send(const char *str)
 {
   Serial.printf("%s", str);
 }
@@ -78,4 +83,5 @@ void loop()
 
   controller(&X_state);
   controller(&Y_state);
+  controller(&Z_state);
 }

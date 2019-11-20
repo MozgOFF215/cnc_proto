@@ -6,6 +6,7 @@
 
 void initControllerX();
 void initControllerY();
+void initControllerZ();
 void controller(State *st);
 void update_MV(State *st);
 void apply_MV(State *st);

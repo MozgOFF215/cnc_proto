@@ -15,10 +15,22 @@ void initControllerY()
   Y_state.kD = 0;   //0.001;
 }
 
+void initControllerZ()
+{
+  Z_state.kP = 0.3; //0.4;
+  Z_state.kI = 0;   //0.1;
+  Z_state.kD = 0;   //0.001;
+}
+
 void controller(State *st)
 {
-  update_MV(st);
-  apply_MV(st);
+  if (st->isStepper())
+    st->NextStep();
+  else
+  {
+    update_MV(st);
+    apply_MV(st);
+  }
 }
 
 void update_MV(State *st)
@@ -79,9 +91,10 @@ void update_MV(State *st)
   st->MV = newMV;
 }
 
-long prevTime = 0;
 void apply_MV(State *st)
 {
+  bool isSuccess = st->checkSuccessfulMove();
+
   int mv = 0;
 
   if (st->MV.pwm != 0)
@@ -110,8 +123,7 @@ void apply_MV(State *st)
   {
     if (!st->isFirstCycle)
     {
-      //SHOW_MESSAGE((String)st->axis_name + " stopped! pos " + st->ToSI(st->currentPos) + " e " + st->e + " isEnd " + st->checkSuccessfulMove());
-      prevTime = micros();
+      //SHOW_MESSAGE((String)st->axis_name + " stopped! pos " + st->ToSI(st->currentPos) + " e " + st->e + " isEnd " + isSuccess);
       st->isFirstCycle = true;
     }
   }

@@ -4,6 +4,9 @@
 #define p_led LED_BUILTIN // PIN_D6 led
 #define p_set0 PIN_F7     // research work area
 
+#define Z_dir PIN_D6
+#define Z_step PIN_D7
+
 // X axis
 
 #define X_turnFwd PIN_C6
@@ -29,5 +32,12 @@
 #define Y_end2 PIN_E7 // endstop + (INT)
 
 #define Y_enB PIN_B5 // ENA (PWM for motor B)
+
+// Z axis
+
+#define Z_dir PIN_D6 // 0 - to down; 1 - to up
+#define Z_step PIN_D7
+
+#define Z_limitMax PIN_C0 // 0 - endstop is active
 
 #endif // _PINS_H_
